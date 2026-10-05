@@ -1,0 +1,263 @@
+/* ===================================================================
+   編集モードの見た目（?edit のときだけ読み込まれる。公開サイトには出ない）
+   =================================================================== */
+
+/* --- パネル --- */
+.ed-panel {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    bottom: 12px;
+    z-index: 5000;
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    font: 12px/1.6 -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+    letter-spacing: 0;
+    color: #222;
+}
+
+.ed-panel.is-folded {
+    bottom: auto;
+}
+
+.ed-panel.is-folded .ed-body,
+.ed-panel.is-folded .ed-foot,
+.ed-panel.is-folded .ed-exit {
+    display: none;
+}
+
+.ed-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e6e6e6;
+}
+
+.ed-width {
+    margin-left: auto;
+    color: #888;
+}
+
+.ed-fold {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #d0d0d0;
+    background: #fff;
+    cursor: pointer;
+}
+
+.ed-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 14px 14px;
+}
+
+.ed-section h3 {
+    margin: 16px 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ed-section h4 {
+    margin: 18px 0 4px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+    font-size: 11px;
+    font-weight: 600;
+    color: #555;
+}
+
+.ed-note,
+.ed-var-note {
+    color: #888;
+    font-size: 11px;
+}
+
+.ed-var {
+    margin-top: 10px;
+}
+
+.ed-var-head {
+    display: flex;
+    justify-content: space-between;
+}
+
+.ed-var-head code {
+    font: 11px/1.6 ui-monospace, Menlo, monospace;
+    color: #0a7d5c;
+}
+
+.ed-real {
+    color: #888;
+}
+
+.ed-num {
+    display: grid;
+    grid-template-columns: 30px 1fr 64px 26px;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.ed-num-label,
+.ed-unit {
+    color: #888;
+    font-size: 11px;
+}
+
+.ed-num input[type="range"] {
+    width: 100%;
+    accent-color: #0a7d5c;
+}
+
+.ed-num input[type="number"],
+.ed-text {
+    width: 100%;
+    padding: 2px 4px;
+    border: 1px solid #d0d0d0;
+    font: inherit;
+}
+
+.ed-foot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-top: 1px solid #e6e6e6;
+}
+
+.ed-status {
+    flex: 1;
+    color: #888;
+    font-size: 11px;
+}
+
+.ed-status.is-dirty {
+    color: #c2410c;
+}
+
+.ed-btn {
+    padding: 6px 14px;
+    border: 1px solid #222;
+    background: #fff;
+    font: inherit;
+    cursor: pointer;
+}
+
+.ed-save {
+    background: #222;
+    color: #fff;
+}
+
+.ed-exit {
+    padding: 0 14px 10px;
+    color: #888;
+    font-size: 11px;
+    text-decoration: underline;
+}
+
+.ed-error {
+    color: #c2410c;
+}
+
+/* 値が何pxになるかを測るための見えない箱 */
+.ed-probe {
+    position: fixed;
+    left: -9999px;
+    height: 0;
+    visibility: hidden;
+}
+
+/* --- 作品カードの編集 --- */
+.ed-on .fade-on-scroll {
+    transition: none;
+}
+
+/* 24列のマス目 */
+.ed-columns {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: grid;
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+    column-gap: var(--gap-x);
+    pointer-events: none;
+}
+
+.ed-columns span {
+    background: rgba(29, 236, 170, 0.07);
+}
+
+/* 自動配置（grid）のときはマス目が1マスに入ってしまうので、全体に広げる */
+.works-grid:not(.is-free) .ed-columns {
+    grid-column: 1 / -1;
+    grid-row: 1 / 99;
+}
+
+.ed-on .works-grid .work-item {
+    cursor: grab;
+    user-select: none;
+    -webkit-user-drag: none;
+    z-index: 1;
+}
+
+.ed-on .works-grid .work-item img,
+.ed-on .works-grid .work-item video {
+    pointer-events: none;
+}
+
+.ed-dragging,
+.ed-dragging * {
+    cursor: grabbing !important;
+}
+
+.ed-on .work-item:hover {
+    outline: 1px dashed #0a7d5c;
+    outline-offset: 4px;
+}
+
+.ed-on .work-item.ed-selected {
+    outline: 2px solid #0a7d5c;
+    outline-offset: 4px;
+    z-index: 2;
+}
+
+.ed-tag {
+    position: absolute;
+    right: 0;
+    bottom: 100%;
+    margin-bottom: 6px;
+    padding: 1px 6px;
+    background: #0a7d5c;
+    color: #fff;
+    font: 11px/1.6 ui-monospace, Menlo, monospace;
+    white-space: pre;
+    opacity: 0;
+}
+
+.ed-on .work-item:hover .ed-tag,
+.ed-on .work-item.ed-selected .ed-tag {
+    opacity: 1;
+}
+
+.ed-handle {
+    position: absolute;
+    right: -7px;
+    bottom: -7px;
+    width: 14px;
+    height: 14px;
+    background: #0a7d5c;
+    border: 2px solid #fff;
+    cursor: ew-resize;
+    opacity: 0;
+}
+
+.ed-on .work-item:hover .ed-handle,
+.ed-on .work-item.ed-selected .ed-handle {
+    opacity: 1;
+}

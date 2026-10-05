@@ -138,10 +138,26 @@ const OFFSET_RATIOS = [0, 1, 0.5, 0];
 // 小さいカードを下げる量（行ごとに順番に使う）
 const DROPS = ['clamp(40px, 8vw, 140px)', 'clamp(24px, 4vw, 64px)'];
 
-function layoutWorks() {
-    const items = [...document.querySelectorAll('.work-item:not(.is-hidden)')];
+// いま選ばれているフィルター（all / video / graphic）
+let currentFilter = 'all';
+// スマホ幅では大小の配置をやめて1列にする（style.css の 768px と揃えている）
+const mobileQuery = window.matchMedia('(max-width: 768px)');
 
-    // ① 表示順のまま、12列に収まるところまでを1行にまとめる
+function layoutWorks() {
+    const grid = document.getElementById('works-grid');
+    if (!grid) return;
+    const items = [...grid.querySelectorAll('.work-item:not(.is-hidden)')];
+
+    // 編集モードで位置を保存してあれば、「All」のときだけその配置を使う。
+    // 絞り込み中は枚数が変わり、保存した配置だと穴が空くので、下の自動配置に任せる。
+    if (currentFilter === 'all' && !mobileQuery.matches && hasSavedLayout(items)) {
+        applySavedLayout(grid, items);
+        return;
+    }
+    grid.classList.remove('is-free');
+    grid.style.height = '';
+
+    // ① 表示順のまま、24列に収まるところまでを1行にまとめる
     const rows = [];
     let current = [];
     let used = 0;
@@ -182,6 +198,47 @@ function layoutWorks() {
             col += card.span;
         });
     });
+}
+
+
+// ===================================================================
+// 1-3. 編集モードで保存した配置（works-layout.js）
+//    x = 何列目から（0〜23） / w = 何列ぶんの幅か / y = 上からの位置。
+//    y は「1列の幅」を1とした単位なので、画面幅が変わっても全体が同じ比率で拡大縮小する。
+//    位置を決めるのは編集モード（_editor/）。ここは保存された値を画面に反映するだけ。
+// ===================================================================
+function hasSavedLayout(items) {
+    if (typeof worksLayout === 'undefined' || !items.length) return false;
+    return items.every(item => worksLayout[item.dataset.code]);
+}
+
+function applySavedLayout(grid, items) {
+    grid.classList.add('is-free');
+    items.forEach(item => {
+        const pos = worksLayout[item.dataset.code];
+        item.style.setProperty('--x', pos.x);
+        item.style.setProperty('--y', pos.y);
+        item.style.setProperty('--w', pos.w);
+    });
+    updateFreeLayoutSize();
+}
+
+/**
+ * 自由配置のときは、カードが絶対配置になって枠の高さが自動で決まらない。
+ * 1列ぶんの幅（--pitch）を測り直し、一番下のカードに合わせて枠の高さを決める。
+ */
+function updateFreeLayoutSize() {
+    const grid = document.getElementById('works-grid');
+    if (!grid || !grid.classList.contains('is-free')) return;
+
+    const gap = parseFloat(getComputedStyle(grid).getPropertyValue('--gap-x')) || 40;
+    grid.style.setProperty('--pitch', `${(grid.clientWidth + gap) / GRID_COLS}px`);
+
+    let bottom = 0;
+    grid.querySelectorAll('.work-item:not(.is-hidden)').forEach(item => {
+        bottom = Math.max(bottom, item.offsetTop + item.offsetHeight);
+    });
+    grid.style.height = `${bottom}px`;
 }
 
 
@@ -248,6 +305,7 @@ function setupFilter() {
             btn.setAttribute('aria-pressed', 'true');
 
             const filterValue = btn.dataset.filter;
+            currentFilter = filterValue;
 
             // ① 動かす前の位置を覚えておく
             const firstRects = new Map();
@@ -321,6 +379,10 @@ function animateFilterShuffle(workItems, firstRects) {
 document.addEventListener('DOMContentLoaded', () => {
     buildWorkCards();
     layoutWorks();
+    // 画面幅が変わったら測り直す。文字（Webフォント）の読み込み後も、カードの高さが変わるので測り直す
+    window.addEventListener('resize', updateFreeLayoutSize);
+    mobileQuery.addEventListener('change', layoutWorks);
+    if (document.fonts) document.fonts.ready.then(updateFreeLayoutSize);
     setupWorksCount();
     setupCardVideos();
     setupFilter();

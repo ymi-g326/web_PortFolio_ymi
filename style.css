@@ -522,9 +522,11 @@ button:focus-visible {
      --col  何列目から置くか / --span 何列ぶん使うか
      --row  何行目か        / --drop 行の中でどれだけ下げるか */
 .works-grid {
+    /* カード同士の横の間隔。自由配置（下記）の計算にも使う */
+    --gap-x: 40px;
     display: grid;
     grid-template-columns: repeat(24, minmax(0, 1fr));
-    gap: 96px 40px;
+    gap: 96px var(--gap-x);
     align-items: start;
 }
 
@@ -532,6 +534,23 @@ button:focus-visible {
     grid-column: var(--col, auto) / span var(--span, 6);
     grid-row: var(--row, auto);
     margin-top: var(--drop, 0px);
+}
+
+/* 自由配置。編集モード（?edit）で位置を保存すると、「All」表示のときにこちらになる。
+   位置の値は works-layout.js、計算は home.js の applySavedLayout()。
+   --pitch は「1列ぶんの幅＋間隔」を JS が測って入れる。y もこの単位なので、
+   画面幅が変わっても配置全体が同じ比率で拡大縮小する。 */
+.works-grid.is-free {
+    display: block;
+    position: relative;
+}
+
+.works-grid.is-free .work-item {
+    position: absolute;
+    left: calc(var(--x) * var(--pitch));
+    top: calc(var(--y) * var(--pitch));
+    width: calc(var(--w) * var(--pitch) - var(--gap-x));
+    margin-top: 0;
 }
 
 .work-item.is-hidden {
@@ -1163,7 +1182,8 @@ button:focus-visible {
     }
 
     .works-grid {
-        gap: 72px 28px;
+        --gap-x: 28px;
+        row-gap: 72px;
     }
 
     .about-grid {

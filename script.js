@@ -21,6 +21,10 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 // スマホ・タブレットなど、マウスホバーが使えない環境の判定
 const isTouchDevice = window.matchMedia('(hover: none)').matches;
 
+// 編集モード：自分のMacで「?edit」を付けて開いたときだけ有効（公開サイトでは常に false）
+const isEditMode = ['localhost', '127.0.0.1'].includes(location.hostname)
+    && new URLSearchParams(location.search).has('edit');
+
 // 素材フォルダの場所（ここを変えれば全ページのパスが一度に変わる）
 const ASSET_IMG = './assets/images/';
 const ASSET_VID = './assets/videos/';
@@ -152,8 +156,8 @@ function setupSplash() {
     let hasSeenSplash = false;
     try { hasSeenSplash = sessionStorage.getItem('hasSeenSplash') === 'true'; } catch (err) { /* 無視 */ }
 
-    // 一度見ている場合・アニメーション抑制設定の場合は、待たせずに消す
-    if (hasSeenSplash || prefersReducedMotion || !splashVideo) {
+    // 一度見ている場合・アニメーション抑制設定の場合・編集モードでは、待たせずに消す
+    if (hasSeenSplash || prefersReducedMotion || isEditMode || !splashVideo) {
         splashScreen.style.display = 'none';
         splashScreen.classList.add('hidden');
         return;
@@ -221,6 +225,25 @@ function setupLogoMotion() {
 
 
 // ===================================================================
+// 6. 編集モードの読み込み
+//    道具一式は _editor/ フォルダにある。GitHub Pages は「_」で始まるフォルダを
+//    公開しないので、公開サイトには編集モードの道具そのものが存在しない。
+// ===================================================================
+function loadEditor() {
+    if (!isEditMode) return;
+
+    const css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = '_editor/editor.css';
+    document.head.appendChild(css);
+
+    const js = document.createElement('script');
+    js.src = '_editor/editor.js';
+    document.body.appendChild(js);
+}
+
+
+// ===================================================================
 // 起動処理（全ページ共通ぶんだけ。ページ固有の処理は home.js / work-detail.js）
 // ===================================================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -229,4 +252,5 @@ document.addEventListener('DOMContentLoaded', () => {
     setupHeroVideo();
     setupLogoMotion();
     setupScrollReveal();
+    loadEditor();
 });
