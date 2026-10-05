@@ -1,9 +1,9 @@
-# m!ntmoch! MotionPortfolio
+# m!ntmoch! Portfolio
 
 友部優聖（m!ntmoch!）のモーショングラフィックス・ポートフォリオサイト。
 `noindex` を付けているので検索には出ず、URLを直接知っている人だけが見られる状態です。
 
-公開URL: https://mm-c2g.github.io/
+公開URL: https://mm-g326.github.io/
 
 ---
 

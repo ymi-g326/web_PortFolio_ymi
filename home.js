@@ -1,5 +1,5 @@
 // ===================================================================
-// m!ntmoch! MotionPortfolio - トップページ専用スクリプト
+// m!ntmoch! Portfolio - トップページ専用スクリプト
 // ===================================================================
 //
 // works-data.js の works 配列から、Works セクションのカードを組み立てます。
@@ -21,7 +21,7 @@ function buildWorkCards() {
         // カード全体を <a> にすることで、キーボード操作・新しいタブで開く・
         // リンクのコピーがすべて普通のリンクと同じように使えるようになる
         const card = document.createElement('a');
-        card.className = 'work-item fade-on-scroll';
+        card.className = `work-item fade-on-scroll ${work.size === 'large' ? 'is-large' : 'is-small'}`;
         card.href = `work-detail.html?id=${encodeURIComponent(work.code)}`;
         card.dataset.category = work.type;
         card.dataset.code = work.code;
@@ -93,24 +93,21 @@ function buildCardInfo(work) {
     const info = document.createElement('div');
     info.className = 'work-info';
     info.innerHTML = `
-        <div class="work-info-main">
-            <h3 class="work-title"></h3>
-            <p class="work-role"></p>
-            <p class="work-category"></p>
-        </div>
-        <span class="work-badge">${work.type === 'video' ? 'VIDEO' : 'GRAPHIC'}</span>
+        <h3 class="work-title"></h3>
+        <p class="work-role"></p>
+        <p class="work-category"><span class="work-code"></span><span>${work.type === 'video' ? 'Video' : 'Graphic'}</span></p>
     `;
     // textContent を使うことで、作品名に記号が入っていても崩れない
     info.querySelector('.work-title').textContent = work.title;
     info.querySelector('.work-role').textContent = work.role || '';
-    info.querySelector('.work-category').textContent = work.code;
+    info.querySelector('.work-code').textContent = work.code;
 
     return info;
 }
 
 
 /**
- * Works 見出しの右端に「08 Projects」と作品数を出す。
+ * Works 見出しの下に「08 Projects」と作品数を出す。
  * 作品を増やしても数を書き換えなくて済むよう、配列の長さから自動で作る。
  */
 function setupWorksCount() {
@@ -118,6 +115,73 @@ function setupWorksCount() {
     if (!el || typeof works === 'undefined') return;
 
     el.textContent = `${String(works.length).padStart(2, '0')} Projects`;
+}
+
+
+// ===================================================================
+// 1-2. 大小のカードを、わざと揃えすぎずに並べる
+//    画面を24列に割り、大きいカードは14列・小さいカードは7列ぶん使う。
+//    カードの大きさを変えたいときは、下の SPAN の数字を変える（合計が24を超えると次の行へ送られる）。
+//    表示順は保ったまま、1行に収まるだけ詰める。奇数行は行の中を左右反転して
+//    大きいカードが左右交互に来るようにし、余った列は行ごとに違う位置へ空ける。
+//    小さいカードは行の中で少し下げて、高さもずらす。
+//    同じ並びなら毎回同じ配置になる（ランダムではない）ので、見た目が安定する。
+//    実際の位置は CSS 変数（--col / --span / --row / --drop）で渡し、
+//    スマホでは style.css 側でこれを無視して1列にしている。
+// ===================================================================
+const GRID_COLS = 24;
+const SPAN = { large: 14, small: 7 };
+// 1枚だけの行で、小さいカードをどの列から置くか（行ごとに順番に使う）
+const LONE_SMALL_STARTS = [13, 1, 17, 7];
+// 余った列のうち、左側に空ける割合（行ごとに順番に使う。0=左寄せ、1=右寄せ）
+const OFFSET_RATIOS = [0, 1, 0.5, 0];
+// 小さいカードを下げる量（行ごとに順番に使う）
+const DROPS = ['clamp(40px, 8vw, 140px)', 'clamp(24px, 4vw, 64px)'];
+
+function layoutWorks() {
+    const items = [...document.querySelectorAll('.work-item:not(.is-hidden)')];
+
+    // ① 表示順のまま、12列に収まるところまでを1行にまとめる
+    const rows = [];
+    let current = [];
+    let used = 0;
+    items.forEach(item => {
+        const span = item.classList.contains('is-large') ? SPAN.large : SPAN.small;
+        if (used + span > GRID_COLS && current.length) {
+            rows.push({ cards: current, used });
+            current = [];
+            used = 0;
+        }
+        current.push({ item, span });
+        used += span;
+    });
+    if (current.length) rows.push({ cards: current, used });
+
+    // ② 行ごとに、余った列をどこに空けるかを決めて配置する
+    rows.forEach((row, r) => {
+        const leftover = GRID_COLS - row.used;
+        const hasLarge = row.cards.some(card => card.span === SPAN.large);
+        // 大きいカードが左右交互に来るよう、奇数行は行の中の並びを左右反転する
+        const cards = r % 2 === 1 ? [...row.cards].reverse() : row.cards;
+
+        let col;
+        if (row.cards.length === 1 && row.cards[0].span === SPAN.small) {
+            col = LONE_SMALL_STARTS[r % LONE_SMALL_STARTS.length];
+        } else {
+            col = 1 + Math.round(leftover * OFFSET_RATIOS[r % OFFSET_RATIOS.length]);
+        }
+
+        cards.forEach((card, i) => {
+            const style = card.item.style;
+            style.setProperty('--col', col);
+            style.setProperty('--span', card.span);
+            style.setProperty('--row', r + 1);
+            // 大きいカードの隣、または小さいカード同士の2枚目以降を下げる
+            const lower = card.span === SPAN.small && row.cards.length > 1 && (hasLarge || i > 0);
+            style.setProperty('--drop', lower ? DROPS[r % DROPS.length] : '0px');
+            col += card.span;
+        });
+    });
 }
 
 
@@ -198,6 +262,7 @@ function setupFilter() {
                 const match = filterValue === 'all' || item.dataset.category === filterValue;
                 item.classList.toggle('is-hidden', !match);
             });
+            layoutWorks();
 
             // ③ 位置の差分からアニメーションさせる
             if (!prefersReducedMotion) {
@@ -255,6 +320,7 @@ function animateFilterShuffle(workItems, firstRects) {
 // ===================================================================
 document.addEventListener('DOMContentLoaded', () => {
     buildWorkCards();
+    layoutWorks();
     setupWorksCount();
     setupCardVideos();
     setupFilter();

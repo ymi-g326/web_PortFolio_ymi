@@ -1,5 +1,5 @@
 // ===================================================================
-// m!ntmoch! MotionPortfolio - 全ページ共通スクリプト
+// m!ntmoch! Portfolio - 全ページ共通スクリプト
 // ===================================================================
 //
 // 【JSファイルの役割分担】
@@ -63,7 +63,7 @@ function safePlay(video) {
 
 // ===================================================================
 // 1. スクロールの現在地
-//    ・ページ上部のグラデーションバーを、読み進めた割合まで伸ばす
+//    ・ヘッダー下端のグラデーションバーを、読み進めた割合まで伸ばす
 //    ・ヘッダーに白い下地を出すかどうかを切り替える
 //
 //    スクロールそのものはブラウザ標準に任せています。以前はホイール操作を
@@ -192,11 +192,41 @@ function setupHeroVideo() {
 
 
 // ===================================================================
+// 5. ヘッダーロゴ
+//    マウスを乗せる・タップする・キーボードで選ぶと、ロゴが1文字ずつ描き直される。
+//    動き自体は CSS（style.css 04 の .is-drawing）。ここではクラスの付け外しだけ行う。
+//    再生中にもう一度触れても最初からやり直さず、最後まで描き切らせる。
+// ===================================================================
+function setupLogoMotion() {
+    const logo = document.getElementById('site-logo');
+    if (!logo || prefersReducedMotion) return;
+
+    // 一番最後に動き終わる線（紺の影の最後の文字）
+    const lastStroke = logo.querySelector('.logo-shadow > g:last-child > :last-child');
+    if (!lastStroke) return;
+
+    const play = () => {
+        if (logo.classList.contains('is-drawing')) return;
+        logo.classList.add('is-drawing');
+    };
+
+    lastStroke.addEventListener('animationend', () => {
+        logo.classList.remove('is-drawing');
+    });
+
+    logo.addEventListener('pointerenter', play);
+    logo.addEventListener('pointerdown', play);
+    logo.addEventListener('focus', play);
+}
+
+
+// ===================================================================
 // 起動処理（全ページ共通ぶんだけ。ページ固有の処理は home.js / work-detail.js）
 // ===================================================================
 document.addEventListener('DOMContentLoaded', () => {
     setupScrollState();
     setupSplash();
     setupHeroVideo();
+    setupLogoMotion();
     setupScrollReveal();
 });

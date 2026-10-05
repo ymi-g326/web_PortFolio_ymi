@@ -7,17 +7,17 @@
     <!-- 検索エンジンには載せず、URLを直接知っている人だけが見られる状態にしている -->
     <meta name="robots" content="noindex,nofollow">
 
-    <title>m!ntmoch! MotionPortfolio</title>
-    <meta name="description" content="友部優聖（m!ntmoch!）のモーショングラフィックス・ポートフォリオ。日本大学芸術学部デザイン学科。映像と平面、両方の制作物をまとめています。">
+    <title>m!ntmoch! Portfolio</title>
+    <meta name="description" content="友部優聖（m!ntmoch!）のポートフォリオ。日本大学芸術学部デザイン学科。制作物をまとめています。">
     <meta name="theme-color" content="#ffffff">
 
     <!-- OGP：URLをSNSやメールで共有したときに出るカード -->
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="m!ntmoch! MotionPortfolio">
-    <meta property="og:title" content="m!ntmoch! MotionPortfolio">
-    <meta property="og:description" content="友部優聖（m!ntmoch!）のモーショングラフィックス・ポートフォリオ。映像と平面、両方の制作物をまとめています。">
-    <meta property="og:url" content="https://mm-c2g.github.io/">
-    <meta property="og:image" content="https://mm-c2g.github.io/assets/images/og-image.jpg">
+    <meta property="og:site_name" content="m!ntmoch! Portfolio">
+    <meta property="og:title" content="m!ntmoch! Portfolio">
+    <meta property="og:description" content="友部優聖（m!ntmoch!）のポートフォリオ。日本大学芸術学部デザイン学科。制作物をまとめています。">
+    <meta property="og:url" content="https://mm-g326.github.io/">
+    <meta property="og:image" content="https://mm-g326.github.io/assets/images/og-image.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
@@ -39,12 +39,39 @@
         <video id="splash-video" src="./assets/videos/mmlogo_2.mp4" autoplay muted playsinline></video>
     </div>
 
-    <!-- スクロール進捗バー（このサイトで唯一グラデーションを使う場所） -->
+    <!-- スクロール進捗バー（ヘッダー下端に沿う。このサイトで唯一グラデーションを使う場所） -->
     <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
 
     <!-- Header -->
     <header class="site-header" id="site-header">
-        <a href="#top" class="site-logo">m<span class="mark">!</span>ntmoch<span class="mark">!</span></a>
+        <a href="#top" class="site-logo" id="site-logo" aria-label="m!ntmoch! トップへ">
+            <!-- ロゴ（assets/favicon.svg）の文字ごとの線を使い、ホバーで1文字ずつ描き直す。
+                 奥の紺が影、手前のミントが本体。動きは script.js「5. ヘッダーロゴ」と style.css 04 -->
+            <svg class="logo-svg" viewBox="66 192 462 210" aria-hidden="true">
+                <g class="logo-shadow" transform="translate(1.7 2.01)">
+                    <g style="--i: 0"><polyline points="300.69 279.84 156.42 212.57 156.42 241.26 78.77 205.05 78.77 272.19" pathLength="1"/></g>
+                    <g style="--i: 1"><line x1="316.25" y1="264.26" x2="221.88" y2="220.26" pathLength="1"/><circle cx="338.11" cy="277.38" r="11.03" pathLength="1"/></g>
+                    <g style="--i: 2"><polyline points="405.02 305.69 405.04 271.64 366.58 253.71 366.5 365.97" pathLength="1"/></g>
+                    <g style="--i: 3"><line x1="432.41" y1="318.21" x2="432.44" y2="238.55" pathLength="1"/><line x1="464.17" y1="277.48" x2="403.31" y2="249.09" pathLength="1"/></g>
+                    <g style="--i: 4"><polyline points="314.2 368.42 169.94 301.14 169.94 329.83 92.28 293.62 92.28 360.76" pathLength="1"/></g>
+                    <g style="--i: 5"><polyline points="250.37 313.09 288.82 331.02 288.82 296.96 250.37 279.03 250.35 313.09" pathLength="1"/></g>
+                    <g style="--i: 6"><polyline points="346.97 357.01 308.52 339.08 308.52 305.03 346.97 322.96" pathLength="1"/></g>
+                    <g style="--i: 7"><polyline points="405.02 383 405.04 348.95 366.58 331.02" pathLength="1"/></g>
+                    <g style="--i: 8"><line x1="483.61" y1="366.08" x2="389.24" y2="322.07" pathLength="1"/><circle cx="505.47" cy="379.2" r="11.03" pathLength="1"/></g>
+                </g>
+                <g class="logo-front" transform="translate(-1.69 -2.01)">
+                    <g style="--i: 0"><polyline points="300.69 279.84 156.42 212.57 156.42 241.26 78.77 205.05 78.77 272.19" pathLength="1"/></g>
+                    <g style="--i: 1"><line x1="316.25" y1="264.26" x2="221.88" y2="220.26" pathLength="1"/><circle cx="338.11" cy="277.38" r="11.03" pathLength="1"/></g>
+                    <g style="--i: 2"><polyline points="405.02 305.69 405.04 271.64 366.58 253.71 366.5 365.97" pathLength="1"/></g>
+                    <g style="--i: 3"><line x1="432.41" y1="318.21" x2="432.44" y2="238.55" pathLength="1"/><line x1="464.17" y1="277.48" x2="403.31" y2="249.09" pathLength="1"/></g>
+                    <g style="--i: 4"><polyline points="314.2 368.42 169.94 301.14 169.94 329.83 92.28 293.62 92.28 360.76" pathLength="1"/></g>
+                    <g style="--i: 5"><polyline points="250.37 313.09 288.82 331.02 288.82 296.96 250.37 279.03 250.35 313.09" pathLength="1"/></g>
+                    <g style="--i: 6"><polyline points="346.97 357.01 308.52 339.08 308.52 305.03 346.97 322.96" pathLength="1"/></g>
+                    <g style="--i: 7"><polyline points="405.02 383 405.04 348.95 366.58 331.02" pathLength="1"/></g>
+                    <g style="--i: 8"><line x1="483.61" y1="366.08" x2="389.24" y2="322.07" pathLength="1"/><circle cx="505.47" cy="379.2" r="11.03" pathLength="1"/></g>
+                </g>
+            </svg>
+        </a>
         <nav class="site-nav" aria-label="メインメニュー">
             <a href="#works">Works</a>
             <a href="#about">About</a>
@@ -57,9 +84,8 @@
         <section class="hero">
             <div class="container hero-inner">
                 <div class="hero-text">
-                    <p class="label">Motion Graphics Portfolio</p>
-                    <h1 class="hero-title">m<span class="mark">!</span>ntmoch<span class="mark">!</span></h1>
-                    <p class="hero-lead">モーショングラフィックスを軸に、映像と平面の両方をつくっています。</p>
+                    <h1 class="hero-title">m!ntmoch! Portfolio</h1>
+                    <p class="hero-lead"></p>
                 </div>
                 <div class="hero-media">
                     <video src="./assets/videos/HPB.mp4" autoplay loop muted playsinline aria-hidden="true"></video>
@@ -76,7 +102,7 @@
                 </div>
 
                 <div class="works-bar fade-on-scroll">
-                    <p class="works-note">映像（VIDEO）と平面（GRAPHIC）の2つの軸で制作しています。</p>
+                    <p class="works-note"></p>
                     <div class="works-filter" role="group" aria-label="カテゴリーで絞り込み">
                         <button class="filter-btn active" data-filter="all" aria-pressed="true">All</button>
                         <button class="filter-btn" data-filter="video" aria-pressed="false">Video</button>
@@ -121,10 +147,6 @@
                                     <ul class="about-tools">
                                         <li>After Effects</li>
                                         <li>Illustrator</li>
-                                        <li>Photoshop</li>
-                                        <li>Premiere Pro</li>
-                                        <li>Ableton Live</li>
-                                        <li>Cinema 4D</li>
                                     </ul>
                                 </dd>
                             </div>
@@ -139,7 +161,7 @@
             <div class="container">
                 <div class="section-head fade-on-scroll">
                     <h2 class="section-title">Contact</h2>
-                    <span class="label">制作のご依頼・ご質問</span>
+                    <span class="label label-ja">制作のご依頼・ご質問</span>
                 </div>
                 <a href="mailto:mintmochi.g326@gmail.com" class="contact-email fade-on-scroll">
                     mintmochi.g326@gmail.com
@@ -150,8 +172,8 @@
 
     <footer class="site-footer">
         <div class="container">
-            <span class="label">&copy; 2026 m!ntmoch!</span>
-            <span class="label">MotionPortfolio</span>
+            <span class="label">m!ntmoch! Portfolio</span>
+            <span class="label">&copy; 2026</span>
         </div>
     </footer>
 

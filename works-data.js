@@ -17,7 +17,10 @@
 //   type      : "video"（映像レイアウト） / "graphic"（平面レイアウト）
 //   title     : 作品名
 //   role      : 担当範囲。個人制作か共同制作かもここに書く。
-//   award     : 受賞歴（ある作品のみ。書くとカードに金色のバッジが出ます）
+//   size      : "large" と書いた作品は、トップで大きなカードになる（見てほしい作品に使う）。
+//               書かない作品は小さなカード。大小の並びは home.js が自動で組み、
+//               わざと揃えすぎない配置にしている。large は全体の3分の1程度までが目安。
+//   award     : 受賞歴（ある作品のみ。書くとカードにミントのバッジが出ます）
 //   thumb     : トップのカードに出すサムネイル。
 //               動画なら { video: "ファイル名.mp4", poster: "静止画.webp" }
 //               静止画なら { image: "ファイル名.webp" }
@@ -45,6 +48,7 @@ const works = [
         code: "2512EZ2",
         type: "video",
         title: "2025 Reel",
+        size: "large",
         role: "個人制作 / 構成・編集",
         thumb: { video: "2025_reel_C.mp4", poster: "2025_s1.webp" },
         youtubeUrl: "https://www.youtube.com/embed/H3ovGvsgaYs?si=9Z3N6DpZvq-V8HhB",
@@ -67,6 +71,7 @@ const works = [
         code: "2511GZ1",
         type: "graphic",
         title: "錯覚",
+        size: "large",
         role: "個人制作 / 企画・グラフィックデザイン",
         award: "第22回 ACジャパン広告学生賞 優秀賞",
         thumb: { image: "sakkaku.webp" },
@@ -169,6 +174,7 @@ const works = [
         code: "2601EG1",
         type: "video",
         title: "「27の先の星」幕間映像",
+        size: "large",
         role: "イベント提供作品 / 映像制作（キャラクターデザイン：dzu）",
         thumb: { video: "27atar_C.mp4", poster: "27star_s1.webp" },
         youtubeUrl: "https://www.youtube.com/embed/i7yF8syupAM?si=0phM6bY1UNHpkF9U",

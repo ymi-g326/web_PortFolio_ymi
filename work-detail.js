@@ -1,5 +1,5 @@
 // ===================================================================
-// m!ntmoch! MotionPortfolio - 作品詳細ページ専用スクリプト
+// m!ntmoch! Portfolio - 作品詳細ページ専用スクリプト
 // ===================================================================
 //
 // URLの ?id=**** で指定された作品を works-data.js から探し、
@@ -34,7 +34,7 @@ function renderHeader(work) {
     document.getElementById('detail-code').textContent = work.code;
     document.getElementById('detail-role').textContent = work.role || '';
 
-    document.title = `${work.title} | m!ntmoch! MotionPortfolio`;
+    document.title = `${work.title} | m!ntmoch! Portfolio`;
 
     if (work.award) {
         const awardEl = document.getElementById('detail-award');

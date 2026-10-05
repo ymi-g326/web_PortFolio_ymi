@@ -1,15 +1,16 @@
 /* ===================================================================
-   m!ntmoch! MotionPortfolio - スタイルシート
+   m!ntmoch! Portfolio - スタイルシート
 
    【デザインの方針】
      ・白ベース。面は「色」ではなく「罫線と余白」で分ける。
      ・巨大な見出しと極小のラベル、その対比だけで情報の階層を作る。
      ・角丸・影・枠線の装飾は使わない。
      ・色はミント（#1decaa）1色。ミント→ピンクのグラデーションは
-       ページ上部のスクロール進捗バー1箇所だけに限定する。
+       ヘッダー下端のスクロール進捗バー1箇所だけに限定する。
      ・フォントは細め（Light〜Regular）で統一する。
 
    【目次】
+     00. 文字の調整パネル ← 文字サイズ・太さ・見出しまわりの余白はここだけ触ればよい
      01. 変数
      02. ベース
      03. 共通パーツ（ラベル / セクション見出し）
@@ -24,6 +25,44 @@
      12. スクロール演出
      13. レスポンシブ
    =================================================================== */
+
+
+/* ===================================================================
+   00. 文字の調整パネル（VS Code で触るのはまずここ）
+
+   見出し・ラベル・余白など、文字まわりの「よく調整する値」をここに集めた。
+   下の各スタイルはこの変数を参照しているので、ここの数値を変えるだけで反映される。
+   clamp(最小, 画面幅に比例, 最大) は、画面幅に応じて最小〜最大の間で伸び縮みする指定。
+   =================================================================== */
+:root {
+    /* --- ヒーロー（ページ最上部の「m!ntmoch! Portfolio」） --- */
+    --hero-title-size: clamp(2.8rem, 4vw, 6.5rem);
+
+    /* --- セクション見出し（Works / About / Contact） --- */
+    --section-title-size: clamp(2rem, 2.8vw, 2.75rem);
+    /* 太さ。読み込んでいるのは 200 / 300 / 400 / 500 の4段階（それ以外は効かない） */
+    --section-title-weight: 400;
+
+    /* --- ラベル（見出し下の「08 Projects」、Profile / Tools、フッターなど） --- */
+    /* 英字のラベル */
+    --label-size: 1.5rem;
+    /* 日本語のラベル（class="label label-ja" を付けたもの。今は「制作のご依頼・ご質問」だけ）。
+       和文フォントは同じ数値でも英字より大きく見えるので、別に調整できるようにしてある */
+    --label-size-ja: 1.3rem;
+    --label-weight: 500;
+    --label-tracking: 0.08em;
+
+    /* --- 見出しまわりの余白 --- */
+    /* 見出しとその下のラベルの間 */
+    --section-head-gap: 8px;
+    /* 見出しブロックから中身（作品一覧・本文）までの間 */
+    --section-head-space: 56px;
+    /* Contact だけ別指定。見出しブロックからメールアドレスまでの間 */
+    --contact-head-space: 24px;
+
+    /* --- Contact のメールアドレス --- */
+    --contact-email-size: clamp(1rem, 3vw, 2.2rem);
+}
 
 
 /* ===================================================================
@@ -59,7 +98,8 @@
          0.92rem … 補足テキスト（キャプション、メタ情報の値、ロゴ）
          0.85rem … ナビ・操作要素（メニュー、フィルター、担当表記）
          0.75rem … 小さいラベル（戻るリンク、ダミー表示）
-         0.68rem … 極小ラベル（作品コード、項目名、セクション見出しの小字）
+         0.68rem … 極小ラベル（作品コード、項目名）
+       .label（見出し下の小字など）のサイズは「00. 文字の調整パネル」で個別に決めている。
 
        唯一の例外が .detail-award（0.78rem）。理由はその定義箇所のコメント参照。
        新しいサイズを足したくなったら、まず上のどれかに収まらないか考えること。 */
@@ -183,54 +223,59 @@ button:focus-visible {
 /* 極小ラベル。作品コード・項目名・注釈など、
    「読ませない情報」はすべてこのスタイルに統一する。
    字送りは 0.08em。実測では ds-k が .08em を244回使っており、6サイト中の最頻値。
-   0.16em は実測の最大値(.11em)より広く、間延びして見えるため下げた。 */
+   0.16em は実測の最大値(.11em)より広く、間延びして見えるため下げた。
+   以前は text-transform: uppercase で全部大文字にしていたが、書いたとおりの表記で出すことにした
+   （大文字にしたい箇所は HTML 側で大文字で書く）。 */
 .label {
     display: inline-block;
-    font-size: 0.68rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
+    font-size: var(--label-size);
+    font-weight: var(--label-weight);
+    letter-spacing: var(--label-tracking);
     line-height: 1.6;
     color: var(--ink-mid);
-    text-transform: uppercase;
 }
 
-/* セクション見出し。巨大な英字＋右端に極小ラベル */
+.label-ja {
+    font-size: var(--label-size-ja);
+}
+
+/* セクション見出し。英字の見出しの真下にラベルを置き、情報をすべて左端に揃える。
+   以前は見出しを左・ラベルを右端に離していたが、視線が左右に往復して疲れるため変更。
+   ページ全体で「左端を縦に読み下ろせば全部わかる」状態を保つこと。 */
 .section-head {
     display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px 24px;
-    margin-bottom: 64px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--section-head-gap);
+    margin-bottom: var(--section-head-space);
 }
 
+#contact .section-head {
+    margin-bottom: var(--contact-head-space);
+}
+
+/* 以前は最大 6rem あり、本文との差が大きすぎて見出しだけ浮いていた。
+   作品カードの作品名（最大 1.6rem）の2倍弱に抑え、ページの中に馴染ませる */
 .section-title {
-    font-size: clamp(2.8rem, 8vw, 6rem);
-    font-weight: 200;
+    font-size: var(--section-title-size);
+    font-weight: var(--section-title-weight);
     letter-spacing: -0.04em;
 }
-
-/* ブランドの「!」。ここだけミントにする。
-   ミント緑は白背景で 1.54:1 と WCAG AA を満たさないが、ここはロゴタイプの一部であり
-   読ませる文字ではないため例外として許容する。本文・リンク・ラベルには絶対に使わないこと
-   （ミントは背景色として使えば黒文字と 12.62:1 で良好）。 */
-.mark {
-    color: var(--mint);
-}
-
 
 /* ===================================================================
    04. スクロール進捗バー・ヘッダー
    =================================================================== */
 
 /* このサイトで唯一グラデーションを使う場所。
-   装飾ではなく「今どこにいるか」を示す機能として置いている。 */
+   装飾ではなく「今どこにいるか」を示す機能として置いている。
+   画面の最上端（2px）では目に入らなかったので、ヘッダーの下端に沿わせて太くした。
+   ヘッダーの罫線（1px）の上に重ねて、罫線が色で満ちていくように見せる。 */
 .scroll-progress {
     position: fixed;
-    top: 0;
+    top: calc(var(--header-h) - 4px);
     left: 0;
     width: 100%;
-    height: 2px;
+    height: 4px;
     z-index: 1200;
     pointer-events: none;
 }
@@ -267,10 +312,54 @@ button:focus-visible {
     border-bottom-color: var(--line);
 }
 
+/* ヘッダーロゴ。assets/favicon.svg と同じ線のロゴを、文字ごとに分けて埋め込んでいる。
+   色はサイトのミント(#1decaa)ではなく、ロゴ本来の2色（ミント #53ba9a / 紺 #242b59）。
+   小さく表示すると元の線幅(4)では細すぎて消えるので、ここだけ太くしている。 */
 .site-logo {
-    font-size: 0.92rem;
-    font-weight: 500;
-    letter-spacing: -0.01em;
+    display: block;
+    line-height: 0;
+}
+
+.logo-svg {
+    height: 34px;
+    width: auto;
+    overflow: visible;
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.logo-front {
+    stroke: #53ba9a;
+}
+
+.logo-shadow {
+    stroke: #242b59;
+}
+
+/* ホバー（スマホではタップ）で、1文字ずつ線が抜けて描き直される。
+   各線に pathLength="1" を付けてあるので、長さの違う線も同じ「0→1」で扱える。
+   破線の位置を 0 → -2 へずらすと、線が終点側へ抜けて消え、始点から再び描かれる。
+   --i は文字の順番（HTML側の style で指定）。紺の影は少し遅れて追いかける。 */
+.site-logo.is-drawing .logo-svg g > * {
+    stroke-dasharray: 1 1;
+    animation: logo-redraw 0.9s cubic-bezier(0.65, 0, 0.35, 1) both;
+    animation-delay: calc(var(--i) * 55ms);
+}
+
+.site-logo.is-drawing .logo-shadow g > * {
+    animation-delay: calc(var(--i) * 55ms + 90ms);
+}
+
+@keyframes logo-redraw {
+    from {
+        stroke-dashoffset: 0;
+    }
+
+    to {
+        stroke-dashoffset: -2;
+    }
 }
 
 .site-nav {
@@ -329,7 +418,7 @@ button:focus-visible {
 
 .hero-title {
     /* 画面幅に応じて滑らかに拡大縮小する。左半分に収まる大きさに調整 */
-    font-size: clamp(2.8rem, 7vw, 6.5rem);
+    font-size: var(--hero-title-size);
     font-weight: 200;
     letter-spacing: -0.05em;
     line-height: 1;
@@ -365,7 +454,7 @@ button:focus-visible {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 16px 32px;
     padding-bottom: 24px;
     margin-bottom: 56px;
@@ -375,6 +464,11 @@ button:focus-visible {
 .works-note {
     font-size: 0.92rem;
     color: var(--ink-mid);
+}
+
+/* 文言を空にしたときは、場所ごと消してフィルターを左端に寄せる */
+.works-note:empty {
+    display: none;
 }
 
 .works-filter {
@@ -422,12 +516,22 @@ button:focus-visible {
 /* ===================================================================
    07. 作品カード
    =================================================================== */
-/* 2列にして1枚あたりを大きく見せる。作品を見せることが最優先なので、
-   枚数を詰め込むより1枚の面積を取る。 */
+/* 見てほしい作品は大きく、それ以外は小さく。大小を混ぜて、わざと揃えすぎない。
+   どのカードを大きくするかは works-data.js の size: "large"。
+   位置は home.js の layoutWorks() が計算し、CSS 変数で渡してくる：
+     --col  何列目から置くか / --span 何列ぶん使うか
+     --row  何行目か        / --drop 行の中でどれだけ下げるか */
 .works-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 88px 40px;
+    grid-template-columns: repeat(24, minmax(0, 1fr));
+    gap: 96px 40px;
+    align-items: start;
+}
+
+.work-item {
+    grid-column: var(--col, auto) / span var(--span, 6);
+    grid-row: var(--row, auto);
+    margin-top: var(--drop, 0px);
 }
 
 .work-item.is-hidden {
@@ -512,18 +616,9 @@ button:focus-visible {
 
 /* --- カード下のテキスト --- */
 .work-info {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 24px;
     margin-top: 20px;
     padding-top: 18px;
     border-top: 1px solid var(--line);
-}
-
-/* min-width: 0 がないと、長い作品名がラベルを押し出して重なる */
-.work-info-main {
-    min-width: 0;
 }
 
 .work-title {
@@ -546,22 +641,15 @@ button:focus-visible {
     margin-bottom: 8px;
 }
 
-/* 作品コード。ラベルと同じ扱いにして、情報としての性格を揃える */
+/* 作品コードと VIDEO / GRAPHIC を1行にまとめる。
+   以前は種別だけカードの右端にあり、作品名から視線を右へ飛ばす必要があった */
 .work-category {
+    display: flex;
+    gap: 16px;
     font-size: 0.68rem;
     font-weight: 500;
     letter-spacing: 0.08em;
     color: var(--ink-weak);
-}
-
-/* VIDEO / GRAPHIC。枠線のバッジをやめ、極小ラベルにした */
-.work-badge {
-    flex-shrink: 0;
-    font-size: 0.68rem;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    color: var(--ink-weak);
-    padding-top: 8px;
 }
 
 
@@ -596,9 +684,9 @@ button:focus-visible {
 }
 
 .about-meta {
+    /* Profile と Tools を横に並べず縦に積み、左端から読み下ろせるようにする */
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 40px;
+    gap: 32px;
     padding-top: 36px;
     border-top: 1px solid var(--line);
 }
@@ -625,7 +713,7 @@ button:focus-visible {
 .contact-email {
     display: inline-block;
     position: relative;
-    font-size: clamp(1.4rem, 5vw, 3.4rem);
+    font-size: var(--contact-email-size);
     font-weight: 200;
     letter-spacing: -0.03em;
     word-break: break-all;
@@ -683,7 +771,6 @@ button:focus-visible {
     font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
     color: var(--ink);
 }
 
@@ -699,18 +786,17 @@ button:focus-visible {
 
 /* --- タイトルまわり --- */
 .detail-header {
+    /* 作品コードを右端ではなくタイトルの上に置き、左端に揃える */
     display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 12px 32px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
     padding-bottom: 28px;
     margin-bottom: 40px;
     border-bottom: 1px solid var(--line);
 }
 
 .detail-header-main {
-    flex: 1 1 320px;
     min-width: 0;
 }
 
@@ -726,7 +812,7 @@ button:focus-visible {
 }
 
 .detail-code {
-    flex-shrink: 0;
+    order: -1;
     font-size: 0.68rem;
     font-weight: 500;
     letter-spacing: 0.08em;
@@ -830,7 +916,6 @@ button:focus-visible {
     font-size: 0.68rem;
     font-weight: 500;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
     color: var(--ink-mid);
 }
 
@@ -913,7 +998,6 @@ button:focus-visible {
     font-size: 0.68rem;
     font-weight: 500;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
     color: var(--ink-mid);
     margin-bottom: 48px;
 }
@@ -1079,7 +1163,7 @@ button:focus-visible {
     }
 
     .works-grid {
-        gap: 64px 32px;
+        gap: 72px 28px;
     }
 
     .about-grid {
@@ -1109,12 +1193,12 @@ button:focus-visible {
         padding-top: 96px;
     }
 
-    .section-head {
-        margin-bottom: 44px;
-    }
-
     .site-nav {
         gap: 18px;
+    }
+
+    .logo-svg {
+        height: 28px;
     }
 
     .hero {
@@ -1125,10 +1209,16 @@ button:focus-visible {
         padding-bottom: 48px;
     }
 
-    /* 1列にして、1枚あたりを大きく見せる */
+    /* スマホでは大小の配置をやめて1列にし、1枚あたりを大きく見せる */
     .works-grid {
         grid-template-columns: 1fr;
         gap: 56px;
+    }
+
+    .work-item {
+        grid-column: 1 / -1;
+        grid-row: auto;
+        margin-top: 0;
     }
 
     .about-grid {
