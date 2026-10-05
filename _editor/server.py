@@ -27,8 +27,8 @@ PANEL_START = '00. 文字の調整パネル（'
 PANEL_END = '01. 変数'
 
 VAR_NAME = re.compile(r'^--[a-z0-9-]+$')
-# 値に使ってよい文字。clamp(1rem, 2vw, 3rem) や 400、24px などが通り、; や { } は通らない
-VAR_VALUE = re.compile(r'^[a-zA-Z0-9.,()%\s+\-*/]{1,120}$')
+# 値に使ってよい文字。clamp(1rem, 2vw, 3rem) や 400、24px、#0a7d5c などが通り、; や { } は通らない
+VAR_VALUE = re.compile(r'^[a-zA-Z0-9#.,()%\s+\-*/]{1,120}$')
 
 
 def save_vars(changes):

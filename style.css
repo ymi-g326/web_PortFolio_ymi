@@ -61,6 +61,9 @@
     --contact-head-space: 0px;
 
     /* --- 作品一覧 --- */
+    /* 作品名にカーソルを乗せたときの色。サイトのミント(#1decaa)は白地で 1.5:1 しかなく
+       文字が読めなくなるので、同じ系統の濃い緑（白地で約5:1）にしている */
+    --text-hover-color: #0a7d5c;
     /* PCでの列の数。画面が狭いと自動で 3 → 2 → 1 列に減る */
     --works-columns: 4;
     /* 列と列の間 */
@@ -648,7 +651,11 @@ button:focus-visible {
     transition: transform 0.6s var(--ease-out);
 }
 
-.work-item:hover .work-image {
+.work-media {
+    display: block;
+}
+
+.work-media.is-link:hover .work-image {
     transform: scale(1.03);
 }
 
@@ -665,8 +672,8 @@ button:focus-visible {
     transition: opacity 0.4s var(--ease-out);
 }
 
-.work-item:hover .work-hover-overlay,
-.work-item:focus-visible .work-hover-overlay {
+.work-media:hover .work-hover-overlay,
+.work-media:focus-visible .work-hover-overlay {
     opacity: 1;
 }
 
@@ -683,8 +690,8 @@ button:focus-visible {
     transition: transform 0.4s var(--ease-out);
 }
 
-.work-item:hover .overlay-icon,
-.work-item:focus-visible .overlay-icon {
+.work-media:hover .overlay-icon,
+.work-media:focus-visible .overlay-icon {
     transform: scale(1);
 }
 
@@ -705,7 +712,9 @@ button:focus-visible {
 }
 
 /* --- カード下のテキスト --- */
+/* 文字の部分が、詳細ページへのリンク */
 .work-info {
+    display: block;
     margin-top: 20px;
     padding-top: 18px;
     border-top: 1px solid var(--line);
@@ -719,8 +728,9 @@ button:focus-visible {
     transition: color 0.3s ease;
 }
 
-.work-item:hover .work-title {
-    color: var(--ink-mid);
+.work-info:hover .work-title,
+.work-info:focus-visible .work-title {
+    color: var(--text-hover-color);
 }
 
 .work-role {
@@ -978,9 +988,18 @@ button:focus-visible {
     border: 1px solid var(--line);
 }
 
+/* 縦長の作品でも1枚まるごと画面に収まるよう、高さを画面の高さまでに抑える */
+.graphic-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 24px;
+}
+
 .graphic-wrapper img {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     height: auto;
+    max-height: calc(100svh - var(--header-h) - 96px);
 }
 
 .graphic-wrapper.dummy-scene {

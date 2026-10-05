@@ -18,11 +18,11 @@ function buildWorkCards() {
     grid.innerHTML = '';
 
     works.forEach((work, index) => {
-        // カード全体を <a> にすることで、キーボード操作・新しいタブで開く・
-        // リンクのコピーがすべて普通のリンクと同じように使えるようになる
-        const card = document.createElement('a');
+        // カードの中は2つに分かれている。
+        //   サムネイル … 映像作品は YouTube を新しいタブで開く。平面作品は押せない（見るだけ）
+        //   下の文字   … 作品の詳細ページへ
+        const card = document.createElement('div');
         card.className = `work-item fade-on-scroll${work.size === 'large' ? ' is-large' : ''}`;
-        card.href = `work-detail.html?id=${encodeURIComponent(work.code)}`;
         card.dataset.category = work.type;
         card.dataset.code = work.code;
         // 並べ直すときに、works-data.js の順番を取り戻すための番号
@@ -40,14 +40,31 @@ function buildWorkCards() {
  * size: "large" の作品は、静止画を組み合わせて縦に長いカードにする（buildCardStills）。
  */
 function buildCardMedia(work) {
-    const wrap = document.createElement('div');
+    const watchUrl = youtubeWatchUrl(work.youtubeUrl);
+    const wrap = document.createElement(watchUrl ? 'a' : 'div');
     wrap.className = 'work-media';
+    if (watchUrl) {
+        wrap.href = watchUrl;
+        wrap.target = '_blank';
+        wrap.rel = 'noopener';
+        wrap.classList.add('is-link');
+        wrap.setAttribute('aria-label', `${work.title} を YouTube で見る（新しいタブで開きます）`);
+    }
     wrap.appendChild(buildCardThumb(work));
     if (work.size === 'large') {
         const stills = buildCardStills(work);
         if (stills) wrap.appendChild(stills);
     }
     return wrap;
+}
+
+/**
+ * 埋め込み用のURL（youtube.com/embed/動画ID?si=…）を、YouTube で直接見るURLに直す。
+ * 形が違うときは空文字を返し、サムネイルは押せない表示になる。
+ */
+function youtubeWatchUrl(embedUrl) {
+    const matched = /youtube\.com\/embed\/([\w-]+)/.exec(embedUrl || '');
+    return matched ? `https://www.youtube.com/watch?v=${matched[1]}` : '';
 }
 
 /**
@@ -110,13 +127,13 @@ function buildCardThumb(work) {
         media.appendChild(img);
     }
 
-    // ホバー時のオーバーレイ（映像は再生アイコン、平面は拡大アイコン）
-    const overlay = document.createElement('div');
-    overlay.className = isVideoThumb ? 'work-hover-overlay' : 'work-hover-overlay graphic-overlay';
-    overlay.innerHTML = isVideoThumb
-        ? `<span class="overlay-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></span>`
-        : `<span class="overlay-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg></span>`;
-    media.appendChild(overlay);
+    // YouTube へ飛べる作品だけ、ホバーで再生アイコンを出す（平面作品は押せないので出さない）
+    if (youtubeWatchUrl(work.youtubeUrl)) {
+        const overlay = document.createElement('div');
+        overlay.className = 'work-hover-overlay';
+        overlay.innerHTML = `<span class="overlay-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg></span>`;
+        media.appendChild(overlay);
+    }
 
     // 受賞作にだけ付く金色のバッジ
     if (work.award) {
@@ -133,8 +150,9 @@ function buildCardThumb(work) {
  * カード下半分（作品名・担当・作品コード・カテゴリーバッジ）を作る。
  */
 function buildCardInfo(work) {
-    const info = document.createElement('div');
+    const info = document.createElement('a');
     info.className = 'work-info';
+    info.href = `work-detail.html?id=${encodeURIComponent(work.code)}`;
     info.innerHTML = `
         <h3 class="work-title"></h3>
         <p class="work-role"></p>
@@ -246,8 +264,9 @@ function setupCardVideos() {
 
         card.addEventListener('mouseenter', play);
         card.addEventListener('mouseleave', stop);
-        card.addEventListener('focus', play);
-        card.addEventListener('blur', stop);
+        // カードの中のリンクにキーボードで移ったときも再生する
+        card.addEventListener('focusin', play);
+        card.addEventListener('focusout', stop);
     });
 }
 
