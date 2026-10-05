@@ -173,91 +173,41 @@
     visibility: hidden;
 }
 
-/* --- 作品カードの編集 --- */
+/* 警告（clamp の最小と最大が逆になっている、など） */
+.ed-warn {
+    margin-top: 4px;
+    color: #c2410c;
+    font-size: 11px;
+}
+
+/* --- 見出しや文章のドラッグ --- */
 .ed-on .fade-on-scroll {
     transition: none;
 }
 
-/* 24列のマス目 */
-.ed-columns {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    display: grid;
-    grid-template-columns: repeat(24, minmax(0, 1fr));
-    column-gap: var(--gap-x);
-    pointer-events: none;
-}
-
-.ed-columns span {
-    background: rgba(29, 236, 170, 0.07);
-}
-
-/* 自動配置（grid）のときはマス目が1マスに入ってしまうので、全体に広げる */
-.works-grid:not(.is-free) .ed-columns {
-    grid-column: 1 / -1;
-    grid-row: 1 / 99;
-}
-
-.ed-on .works-grid .work-item {
-    cursor: grab;
+.ed-on [data-pos] {
+    cursor: move;
     user-select: none;
     -webkit-user-drag: none;
-    z-index: 1;
 }
 
-.ed-on .works-grid .work-item img,
-.ed-on .works-grid .work-item video {
-    pointer-events: none;
-}
-
-.ed-dragging,
-.ed-dragging * {
-    cursor: grabbing !important;
-}
-
-.ed-on .work-item:hover {
+.ed-on [data-pos]:hover {
     outline: 1px dashed #0a7d5c;
     outline-offset: 4px;
 }
 
-.ed-on .work-item.ed-selected {
-    outline: 2px solid #0a7d5c;
-    outline-offset: 4px;
-    z-index: 2;
+.ed-dragging,
+.ed-dragging * {
+    cursor: move !important;
 }
 
-.ed-tag {
-    position: absolute;
-    right: 0;
-    bottom: 100%;
-    margin-bottom: 6px;
-    padding: 1px 6px;
-    background: #0a7d5c;
-    color: #fff;
-    font: 11px/1.6 ui-monospace, Menlo, monospace;
-    white-space: pre;
-    opacity: 0;
-}
+/* スマホ幅ではずらしが効かないので、ドラッグできる印も出さない */
+@media (max-width: 768px) {
+    .ed-on [data-pos] {
+        cursor: auto;
+    }
 
-.ed-on .work-item:hover .ed-tag,
-.ed-on .work-item.ed-selected .ed-tag {
-    opacity: 1;
-}
-
-.ed-handle {
-    position: absolute;
-    right: -7px;
-    bottom: -7px;
-    width: 14px;
-    height: 14px;
-    background: #0a7d5c;
-    border: 2px solid #fff;
-    cursor: ew-resize;
-    opacity: 0;
-}
-
-.ed-on .work-item:hover .ed-handle,
-.ed-on .work-item.ed-selected .ed-handle {
-    opacity: 1;
+    .ed-on [data-pos]:hover {
+        outline: none;
+    }
 }

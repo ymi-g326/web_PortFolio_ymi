@@ -21,10 +21,12 @@ function buildWorkCards() {
         // カード全体を <a> にすることで、キーボード操作・新しいタブで開く・
         // リンクのコピーがすべて普通のリンクと同じように使えるようになる
         const card = document.createElement('a');
-        card.className = `work-item fade-on-scroll ${work.size === 'large' ? 'is-large' : 'is-small'}`;
+        card.className = `work-item fade-on-scroll${work.size === 'large' ? ' is-large' : ''}`;
         card.href = `work-detail.html?id=${encodeURIComponent(work.code)}`;
         card.dataset.category = work.type;
         card.dataset.code = work.code;
+        // 並べ直すときに、works-data.js の順番を取り戻すための番号
+        card.dataset.order = index;
         // 1枚ずつ少しずつ遅らせて出現させる（最大0.4秒まで）
         card.style.transitionDelay = `${Math.min(index * 0.06, 0.4)}s`;
 
@@ -35,8 +37,43 @@ function buildWorkCards() {
 
 /**
  * カード上半分（サムネイル＋ホバー演出＋受賞バッジ）を作る。
+ * size: "large" の作品は、静止画を組み合わせて縦に長いカードにする（buildCardStills）。
  */
 function buildCardMedia(work) {
+    const wrap = document.createElement('div');
+    wrap.className = 'work-media';
+    wrap.appendChild(buildCardThumb(work));
+    if (work.size === 'large') {
+        const stills = buildCardStills(work);
+        if (stills) wrap.appendChild(stills);
+    }
+    return wrap;
+}
+
+/**
+ * 大きく見せる作品の、サムネイルの下に並べる静止画。
+ * 映像作品はシーン画像（scenes）から、サムネイルと同じ画像を除いて最大2枚。
+ * 平面作品は静止画を足さず、サムネイルを切り抜かずに元の縦横比で見せる（buildCardThumb 側）。
+ */
+function buildCardStills(work) {
+    const poster = (work.thumb || {}).poster;
+    const extras = (work.scenes || []).filter(src => src && src !== poster).slice(0, 2);
+    if (!extras.length) return null;
+
+    const stills = document.createElement('div');
+    stills.className = `work-stills is-${extras.length}`;
+    extras.forEach(src => {
+        const img = document.createElement('img');
+        img.src = ASSET_IMG + src;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        stills.appendChild(img);
+    });
+    return stills;
+}
+
+function buildCardThumb(work) {
     const thumb = work.thumb || {};
     const isVideoThumb = !!thumb.video;
 
@@ -60,6 +97,12 @@ function buildCardMedia(work) {
     } else if (thumb.image) {
         const img = document.createElement('img');
         img.className = 'work-image';
+        // 大きく見せる平面作品は、切り抜かずに元の縦横比で見せる
+        if (work.size === 'large') {
+            media.classList.add('is-natural');
+            // 読み込み後に高さが決まるので、そのときに並びを組み直す
+            img.addEventListener('load', () => layoutWorks());
+        }
         img.src = ASSET_IMG + thumb.image;
         img.alt = work.title;
         img.loading = 'lazy';
@@ -119,126 +162,49 @@ function setupWorksCount() {
 
 
 // ===================================================================
-// 1-2. 大小のカードを、わざと揃えすぎずに並べる
-//    画面を24列に割り、大きいカードは14列・小さいカードは7列ぶん使う。
-//    カードの大きさを変えたいときは、下の SPAN の数字を変える（合計が24を超えると次の行へ送られる）。
-//    表示順は保ったまま、1行に収まるだけ詰める。奇数行は行の中を左右反転して
-//    大きいカードが左右交互に来るようにし、余った列は行ごとに違う位置へ空ける。
-//    小さいカードは行の中で少し下げて、高さもずらす。
-//    同じ並びなら毎回同じ配置になる（ランダムではない）ので、見た目が安定する。
-//    実際の位置は CSS 変数（--col / --span / --row / --drop）で渡し、
-//    スマホでは style.css 側でこれを無視して1列にしている。
+// 1-2. カードを同じ幅の列に積んでいく（石垣のような並べ方）
+//    列の数は style.css「00. 文字の調整パネル」の --works-columns（PCでの列数）。
+//    画面が狭いときは自動で減らす（下の columnsForWidth）。
+//    カードは表示順に、その時点で一番短い列へ入れていく。
+//    幅はどのカードも同じなので、Video / Graphic で絞り込んでも大きさは変わらない。
+//    大きく見せたい作品は、静止画を組み合わせて縦に長くしている（buildCardStills）。
 // ===================================================================
-const GRID_COLS = 24;
-const SPAN = { large: 14, small: 7 };
-// 1枚だけの行で、小さいカードをどの列から置くか（行ごとに順番に使う）
-const LONE_SMALL_STARTS = [13, 1, 17, 7];
-// 余った列のうち、左側に空ける割合（行ごとに順番に使う。0=左寄せ、1=右寄せ）
-const OFFSET_RATIOS = [0, 1, 0.5, 0];
-// 小さいカードを下げる量（行ごとに順番に使う）
-const DROPS = ['clamp(40px, 8vw, 140px)', 'clamp(24px, 4vw, 64px)'];
-
-// いま選ばれているフィルター（all / video / graphic）
-let currentFilter = 'all';
-// スマホ幅では大小の配置をやめて1列にする（style.css の 768px と揃えている）
-const mobileQuery = window.matchMedia('(max-width: 768px)');
+function columnsForWidth(max) {
+    const w = window.innerWidth;
+    if (w <= 600) return 1;
+    if (w <= 900) return Math.min(max, 2);
+    if (w <= 1200) return Math.min(max, 3);
+    return max;
+}
 
 function layoutWorks() {
     const grid = document.getElementById('works-grid');
     if (!grid) return;
-    const items = [...grid.querySelectorAll('.work-item:not(.is-hidden)')];
 
-    // 編集モードで位置を保存してあれば、「All」のときだけその配置を使う。
-    // 絞り込み中は枚数が変わり、保存した配置だと穴が空くので、下の自動配置に任せる。
-    if (currentFilter === 'all' && !mobileQuery.matches && hasSavedLayout(items)) {
-        applySavedLayout(grid, items);
-        return;
-    }
-    grid.classList.remove('is-free');
-    grid.style.height = '';
+    // 一度列に分けると、ページ上の順番が「列ごと」になってしまうので、元の順番に並べ直してから配る
+    const items = [...grid.querySelectorAll('.work-item')]
+        .sort((a, b) => a.dataset.order - b.dataset.order);
+    const max = parseInt(getComputedStyle(grid).getPropertyValue('--works-columns'), 10) || 4;
+    const count = columnsForWidth(max);
 
-    // ① 表示順のまま、24列に収まるところまでを1行にまとめる
-    const rows = [];
-    let current = [];
-    let used = 0;
+    // 列の箱を作り直す（カード自体は作り直さず、移し替えるだけ）
+    const columns = Array.from({ length: count }, () => {
+        const col = document.createElement('div');
+        col.className = 'works-col';
+        return col;
+    });
+    grid.querySelectorAll('.works-col').forEach(col => col.remove());
+    columns.forEach(col => grid.appendChild(col));
+
     items.forEach(item => {
-        const span = item.classList.contains('is-large') ? SPAN.large : SPAN.small;
-        if (used + span > GRID_COLS && current.length) {
-            rows.push({ cards: current, used });
-            current = [];
-            used = 0;
+        // 非表示のカードは高さに影響しないので、どこに入れてもよい
+        if (item.classList.contains('is-hidden')) {
+            columns[count - 1].appendChild(item);
+            return;
         }
-        current.push({ item, span });
-        used += span;
+        const shortest = columns.reduce((a, b) => (b.offsetHeight < a.offsetHeight ? b : a));
+        shortest.appendChild(item);
     });
-    if (current.length) rows.push({ cards: current, used });
-
-    // ② 行ごとに、余った列をどこに空けるかを決めて配置する
-    rows.forEach((row, r) => {
-        const leftover = GRID_COLS - row.used;
-        const hasLarge = row.cards.some(card => card.span === SPAN.large);
-        // 大きいカードが左右交互に来るよう、奇数行は行の中の並びを左右反転する
-        const cards = r % 2 === 1 ? [...row.cards].reverse() : row.cards;
-
-        let col;
-        if (row.cards.length === 1 && row.cards[0].span === SPAN.small) {
-            col = LONE_SMALL_STARTS[r % LONE_SMALL_STARTS.length];
-        } else {
-            col = 1 + Math.round(leftover * OFFSET_RATIOS[r % OFFSET_RATIOS.length]);
-        }
-
-        cards.forEach((card, i) => {
-            const style = card.item.style;
-            style.setProperty('--col', col);
-            style.setProperty('--span', card.span);
-            style.setProperty('--row', r + 1);
-            // 大きいカードの隣、または小さいカード同士の2枚目以降を下げる
-            const lower = card.span === SPAN.small && row.cards.length > 1 && (hasLarge || i > 0);
-            style.setProperty('--drop', lower ? DROPS[r % DROPS.length] : '0px');
-            col += card.span;
-        });
-    });
-}
-
-
-// ===================================================================
-// 1-3. 編集モードで保存した配置（works-layout.js）
-//    x = 何列目から（0〜23） / w = 何列ぶんの幅か / y = 上からの位置。
-//    y は「1列の幅」を1とした単位なので、画面幅が変わっても全体が同じ比率で拡大縮小する。
-//    位置を決めるのは編集モード（_editor/）。ここは保存された値を画面に反映するだけ。
-// ===================================================================
-function hasSavedLayout(items) {
-    if (typeof worksLayout === 'undefined' || !items.length) return false;
-    return items.every(item => worksLayout[item.dataset.code]);
-}
-
-function applySavedLayout(grid, items) {
-    grid.classList.add('is-free');
-    items.forEach(item => {
-        const pos = worksLayout[item.dataset.code];
-        item.style.setProperty('--x', pos.x);
-        item.style.setProperty('--y', pos.y);
-        item.style.setProperty('--w', pos.w);
-    });
-    updateFreeLayoutSize();
-}
-
-/**
- * 自由配置のときは、カードが絶対配置になって枠の高さが自動で決まらない。
- * 1列ぶんの幅（--pitch）を測り直し、一番下のカードに合わせて枠の高さを決める。
- */
-function updateFreeLayoutSize() {
-    const grid = document.getElementById('works-grid');
-    if (!grid || !grid.classList.contains('is-free')) return;
-
-    const gap = parseFloat(getComputedStyle(grid).getPropertyValue('--gap-x')) || 40;
-    grid.style.setProperty('--pitch', `${(grid.clientWidth + gap) / GRID_COLS}px`);
-
-    let bottom = 0;
-    grid.querySelectorAll('.work-item:not(.is-hidden)').forEach(item => {
-        bottom = Math.max(bottom, item.offsetTop + item.offsetHeight);
-    });
-    grid.style.height = `${bottom}px`;
 }
 
 
@@ -305,7 +271,6 @@ function setupFilter() {
             btn.setAttribute('aria-pressed', 'true');
 
             const filterValue = btn.dataset.filter;
-            currentFilter = filterValue;
 
             // ① 動かす前の位置を覚えておく
             const firstRects = new Map();
@@ -379,10 +344,13 @@ function animateFilterShuffle(workItems, firstRects) {
 document.addEventListener('DOMContentLoaded', () => {
     buildWorkCards();
     layoutWorks();
-    // 画面幅が変わったら測り直す。文字（Webフォント）の読み込み後も、カードの高さが変わるので測り直す
-    window.addEventListener('resize', updateFreeLayoutSize);
-    mobileQuery.addEventListener('change', layoutWorks);
-    if (document.fonts) document.fonts.ready.then(updateFreeLayoutSize);
+    // 画面幅が変わったら組み直す。文字（Webフォント）の読み込み後も、カードの高さが変わるので組み直す
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(layoutWorks, 150);
+    });
+    if (document.fonts) document.fonts.ready.then(layoutWorks);
     setupWorksCount();
     setupCardVideos();
     setupFilter();

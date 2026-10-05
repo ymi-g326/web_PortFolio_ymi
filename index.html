@@ -84,10 +84,10 @@
         <section class="hero">
             <div class="container hero-inner">
                 <div class="hero-text">
-                    <h1 class="hero-title">m!ntmoch! Portfolio</h1>
-                    <p class="hero-lead"></p>
+                    <h1 class="hero-title" data-pos="hero-title">m!ntmoch! Portfolio</h1>
+                    <p class="hero-lead" data-pos="hero-lead"></p>
                 </div>
-                <div class="hero-media">
+                <div class="hero-media" data-pos="hero-media">
                     <video src="./assets/videos/HPB.mp4" autoplay loop muted playsinline aria-hidden="true"></video>
                 </div>
             </div>
@@ -97,13 +97,13 @@
         <section id="works" class="section">
             <div class="container">
                 <div class="section-head fade-on-scroll">
-                    <h2 class="section-title">Works</h2>
-                    <span class="label" id="works-count"></span>
+                    <h2 class="section-title" data-pos="works-title">Works</h2>
+                    <span class="label" id="works-count" data-pos="works-label"></span>
                 </div>
 
                 <div class="works-bar fade-on-scroll">
                     <p class="works-note"></p>
-                    <div class="works-filter" role="group" aria-label="カテゴリーで絞り込み">
+                    <div class="works-filter" data-pos="works-filter" role="group" aria-label="カテゴリーで絞り込み">
                         <button class="filter-btn active" data-filter="all" aria-pressed="true">All</button>
                         <button class="filter-btn" data-filter="video" aria-pressed="false">Video</button>
                         <button class="filter-btn" data-filter="graphic" aria-pressed="false">Graphic</button>
@@ -119,24 +119,24 @@
         <section id="about" class="section">
             <div class="container">
                 <div class="section-head fade-on-scroll">
-                    <h2 class="section-title">About</h2>
-                    <span class="label">m!ntmoch! / Yusei Tomobe</span>
+                    <h2 class="section-title" data-pos="about-title">About</h2>
+                    <span class="label" data-pos="about-label">m!ntmoch! / Yusei Tomobe</span>
                 </div>
 
                 <div class="about-grid">
-                    <div class="about-media fade-on-scroll">
+                    <div class="about-media fade-on-scroll" data-pos="about-media">
                         <img src="./assets/favicon.svg" alt="m!ntmoch! ロゴ" width="476" height="476"
                             class="about-logo">
                     </div>
 
                     <div class="about-body fade-on-scroll">
-                        <p class="about-intro">
+                        <p class="about-intro" data-pos="about-intro">
                             静止しているものに「動き」が加わることで、楽しくなったり可愛くなったり、目を惹くものになる。
                             そういうところに魅力を感じていて、自分にとっての「動く美」、芯となるものを追求しています。
                             デザインは印象に残る体験こそが大事だと思っているので、それを軸に制作を心がけています。
                         </p>
 
-                        <dl class="about-meta">
+                        <dl class="about-meta" data-pos="about-meta">
                             <div>
                                 <dt class="label">Profile</dt>
                                 <dd>日本大学芸術学部デザイン学科3年<br>モーショングラフィックスをメインに、幅広く制作中。<br>緑と雨が好き。</dd>
@@ -160,10 +160,10 @@
         <section id="contact" class="section">
             <div class="container">
                 <div class="section-head fade-on-scroll">
-                    <h2 class="section-title">Contact</h2>
-                    <span class="label label-ja">制作のご依頼・ご質問</span>
+                    <h2 class="section-title" data-pos="contact-title">Contact</h2>
+                    <span class="label label-ja" data-pos="contact-label">制作のご依頼・ご質問</span>
                 </div>
-                <a href="mailto:mintmochi.g326@gmail.com" class="contact-email fade-on-scroll">
+                <a href="mailto:mintmochi.g326@gmail.com" class="contact-email fade-on-scroll" data-pos="contact-email">
                     mintmochi.g326@gmail.com
                 </a>
             </div>
@@ -179,7 +179,6 @@
 
     <!-- データ → 共通処理 → このページ専用処理、の順で読み込む -->
     <script src="works-data.js"></script>
-    <script src="works-layout.js"></script>
     <script src="script.js"></script>
     <script src="home.js"></script>
 </body>
