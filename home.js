@@ -160,6 +160,8 @@ function buildCardInfo(work) {
     `;
     // textContent を使うことで、作品名に記号が入っていても崩れない
     info.querySelector('.work-title').textContent = work.title;
+    // ホバーで重なるミントの文字（style.css の .work-title::after）は、この値を表示する
+    info.querySelector('.work-title').dataset.text = work.title;
     info.querySelector('.work-role').textContent = work.role || '';
     info.querySelector('.work-code').textContent = work.code;
 

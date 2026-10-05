@@ -61,9 +61,11 @@
     --contact-head-space: 0px;
 
     /* --- 作品一覧 --- */
-    /* 作品名にカーソルを乗せたときの色。サイトのミント(#1decaa)は白地で 1.5:1 しかなく
-       文字が読めなくなるので、同じ系統の濃い緑（白地で約5:1）にしている */
-    --text-hover-color: #0a7d5c;
+    /* 作品名にカーソルを乗せると、ミントの同じ文字が少しずれて重なる（ロゴの「ミント＋紺の影」と同じ考え方）。
+       黒い文字はそのまま残るので、ミントでも読めなくならない */
+    --title-hover-color: #1decaa;
+    /* ミントの文字のずらし量（横 縦）。マイナスで左上へ。ロゴは線の太さと同じくらいずれている */
+    --title-hover-shift: -2px -3px;
     /* PCでの列の数。画面が狭いと自動で 3 → 2 → 1 列に減る */
     --works-columns: 4;
     /* 列と列の間 */
@@ -721,6 +723,7 @@ button:focus-visible {
 }
 
 .work-title {
+    position: relative;
     font-size: clamp(1.25rem, 2vw, 1.6rem);
     font-weight: 400;
     letter-spacing: -0.01em;
@@ -728,9 +731,23 @@ button:focus-visible {
     transition: color 0.3s ease;
 }
 
-.work-info:hover .work-title,
-.work-info:focus-visible .work-title {
-    color: var(--text-hover-color);
+/* ホバーで、ミントの同じ文字が左から差し込まれ、少し左上にずれて黒い文字に重なる。
+   黒い文字が影のように見えるのは、ヘッダーのロゴ（ミント＋紺の影）と同じ見え方 */
+.work-title::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    color: var(--title-hover-color);
+    pointer-events: none;
+    clip-path: inset(0 100% 0 0);
+    translate: 0 0;
+    transition: clip-path 0.45s var(--ease-out), translate 0.45s var(--ease-out);
+}
+
+.work-info:hover .work-title::after,
+.work-info:focus-visible .work-title::after {
+    clip-path: inset(0 0 0 0);
+    translate: var(--title-hover-shift);
 }
 
 .work-role {
