@@ -65,7 +65,7 @@
        黒い文字はそのまま残るので、ミントでも読めなくならない */
     --title-hover-color: #1decaa;
     /* ミントの文字のずらし量（横 縦）。マイナスで左上へ。ロゴは線の太さと同じくらいずれている */
-    --title-hover-shift: -2px -3px;
+    --title-hover-shift: -1px -1.5px;
     /* PCでの列の数。画面が狭いと自動で 3 → 2 → 1 列に減る */
     --works-columns: 4;
     /* 列と列の間 */
