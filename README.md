@@ -1,9 +1,9 @@
 # m!ntmoch! MotionPortfolio
 
-友部佑征（m!ntmoch!）のモーショングラフィックス・ポートフォリオサイト。
+友部優聖（m!ntmoch!）のモーショングラフィックス・ポートフォリオサイト。
 `noindex` を付けているので検索には出ず、URLを直接知っている人だけが見られる状態です。
 
-公開URL: https://mm-c2g.github.io/mintmochi_motionportfolio_ver1.0/
+公開URL: https://mm-c2g.github.io/
 
 ---
 

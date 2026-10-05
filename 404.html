@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex,nofollow">
+    <title>ページが見つかりません | m!ntmoch! MotionPortfolio</title>
+
+    <!--
+        旧URLからの転送。
+        このサイトは以前 https://mm-c2g.github.io/mintmochi_motionportfolio_ver1.0/ で公開しており、
+        そのURLを書いたポートフォリオ（PDF）をすでに提出している。リポジトリ名を変えると
+        GitHub Pages は旧URLを自動で転送しない（公式ドキュメントで「project site URLs は例外」と明記）。
+        そこで、存在しないパスに来た人にGitHubが返すこの 404.html で、旧URLを同じページの新URLへ送る。
+        例: /mintmochi_motionportfolio_ver1.0/work-detail.html?id=2511GZ1
+          → /work-detail.html?id=2511GZ1
+        画面を描く前に転送するため、<head> の中で実行している。
+    -->
+    <script>
+        (function () {
+            var OLD = '/mintmochi_motionportfolio_ver1.0';
+            var path = location.pathname;
+            if (path === OLD || path.indexOf(OLD + '/') === 0) {
+                var rest = path.slice(OLD.length) || '/';
+                location.replace(rest + location.search + location.hash);
+            }
+        })();
+    </script>
+
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <!-- 404はどの階層のURLでも表示されるので、相対パスではなくルートからの絶対パスで読む -->
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <main class="container" style="padding-top: 160px; padding-bottom: 160px;">
+        <p class="label">404</p>
+        <h1 class="section-title" style="margin: 16px 0 32px;">Not Found</h1>
+        <p style="color: var(--ink-mid); margin-bottom: 40px;">お探しのページは見つかりませんでした。</p>
+        <a href="/" class="detail-site-link">トップページへ</a>
+    </main>
+</body>
+
+</html>
