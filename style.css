@@ -145,9 +145,9 @@
     --line: #e4e4e4;
 
     /* アクセント。使う量を絞るほど効く */
-    --mint: #1decaa;
-    --pink: #eb2b98;
-    --gradient-signature: linear-gradient(90deg, var(--mint), var(--pink));
+    --mint: #10efa8;
+    --pink: #ffc6e6;
+    --gradient-signature: linear-gradient(90deg, var(--mint),var(--pink));
 
     /* 欧文は Inter、和文は Zen Kaku Gothic New。
        両方を1つの font-family に並べると、文字ごとに自動で使い分けられる。 */
@@ -339,10 +339,10 @@ button:focus-visible {
    ヘッダーの罫線（1px）の上に重ねて、罫線が色で満ちていくように見せる。 */
 .scroll-progress {
     position: fixed;
-    top: calc(var(--header-h) - 4px);
+    top: calc(var(--header-h) - 3px);
     left: 0;
     width: 100%;
-    height: 4px;
+    height: 3px;
     z-index: 1200;
     pointer-events: none;
 }
