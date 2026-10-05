@@ -174,7 +174,6 @@ const works = [
         code: "2601EG1",
         type: "video",
         title: "「27の先の星」幕間映像",
-        size: "large",
         role: "イベント提供作品 / 映像制作（キャラクターデザイン：dzu）",
         thumb: { video: "27atar_C.mp4", poster: "27star_s1.webp" },
         youtubeUrl: "https://www.youtube.com/embed/i7yF8syupAM?si=0phM6bY1UNHpkF9U",

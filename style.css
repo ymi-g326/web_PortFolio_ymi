@@ -36,10 +36,10 @@
    =================================================================== */
 :root {
     /* --- ヒーロー（ページ最上部の「m!ntmoch! Portfolio」） --- */
-    --hero-title-size: clamp(3.8rem, 5.2vw, 2.8rem);
+    --hero-title-size: clamp(1.9rem, 5.2vw, 4rem);
 
     /* --- セクション見出し（Works / About / Contact） --- */
-    --section-title-size: clamp(3.15rem, 2.8vw, 2.75rem);
+    --section-title-size: clamp(2.75rem, 2.8vw, 4.2rem);
     /* 太さ。読み込んでいるのは 200 / 300 / 400 / 500 の4段階（それ以外は効かない） */
     --section-title-weight: 300;
 
@@ -74,7 +74,7 @@
     /* --- 位置（「横 縦」のずらし量。編集モードで文字をドラッグすると変わる） --- */
     /* 元の位置からどれだけ動かすか。0px 0px が元の位置。スマホ幅では無効（崩れないように） */
     /* ヒーローの見出し */
-    --pos-hero-title: 0px 0px;
+    --pos-hero-title: 0px 11px;
     /* ヒーローの説明文 */
     --pos-hero-lead: 0px 0px;
     /* ヒーローの動画 */
@@ -82,23 +82,23 @@
     /* Works 見出し */
     --pos-works-title: 0px 0px;
     /* Works のラベル */
-    --pos-works-label: 0px 0px;
+    --pos-works-label: 5px 2px;
     /* 絞り込みボタン */
     --pos-works-filter: 0px 0px;
     /* About 見出し */
     --pos-about-title: 0px 0px;
     /* About のラベル */
-    --pos-about-label: 0px 0px;
+    --pos-about-label: 5px 0px;
     /* About のロゴ */
     --pos-about-media: 0px 0px;
     /* About の文章 */
     --pos-about-intro: 0px 0px;
     /* Profile / Tools */
-    --pos-about-meta: 0px 0px;
+    --pos-about-meta: 0px -21px;
     /* Contact 見出し */
     --pos-contact-title: 0px 0px;
     /* Contact のラベル */
-    --pos-contact-label: 0px 0px;
+    --pos-contact-label: 0px 9px;
     /* メールアドレス */
     --pos-contact-email: 0px 0px;
 }
