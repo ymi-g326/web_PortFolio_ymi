@@ -57,6 +57,15 @@ function formatWorkPeriod(code) {
 }
 
 /**
+ * 埋め込み用のURL（youtube.com/embed/動画ID?si=…）を、YouTube で直接見るURLに直す。
+ * 形が違うときは空文字を返し、呼び出し側でリンクを出さない。
+ */
+function youtubeWatchUrl(embedUrl) {
+    const matched = /youtube\.com\/embed\/([\w-]+)/.exec(embedUrl || '');
+    return matched ? `https://www.youtube.com/watch?v=${matched[1]}` : '';
+}
+
+/**
  * 動画を再生する。ブラウザに自動再生をブロックされてもエラーで止まらないようにする。
  */
 function safePlay(video) {

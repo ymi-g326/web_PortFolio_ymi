@@ -954,15 +954,41 @@ button:focus-visible {
 }
 
 /* --- 映像レイアウト --- */
+/* 映像を左、シーン画像を右の列に縦に積む。
+   列の幅は映像の 1/枚数 にしてあるので、積んだ高さが映像の高さとほぼ揃う。
+   全体の幅は「映像の高さが画面に収まる」ところまでに抑え、1画面で全部見えるようにしている。 */
+.video-stage {
+    --scene-count: 0;
+    /* 画面の高さから、ヘッダーと上下の余白を引いた、映像に使える高さ */
+    --stage-fit: calc(100svh - var(--header-h) - 96px);
+    margin-bottom: 24px;
+}
+
+.video-stage.has-scenes {
+    display: grid;
+    /* 「映像 枚数fr : シーン列 1fr」。fr は calc で計算できないので、work-detail.js が --stage-cols に入れる */
+    grid-template-columns: var(--stage-cols, 4fr 1fr);
+    gap: 12px;
+    align-items: start;
+    /* 映像の高さ ≒ 全体の幅 × 枚数/(枚数+1) × 9/16 が、--stage-fit を超えない幅 */
+    max-width: calc(var(--stage-fit) * 16 / 9 * (var(--scene-count) + 1) / var(--scene-count));
+}
+
+.video-stage:not(.has-scenes) {
+    max-width: calc(var(--stage-fit) * 16 / 9);
+}
+
 .youtube-wrapper {
     position: relative;
     width: 100%;
-    /* 16:9 の比率を保つための定番の書き方 */
-    padding-bottom: 56.25%;
-    height: 0;
+    aspect-ratio: 16/9;
     overflow: hidden;
     background-color: var(--bg-sub);
-    margin-bottom: 40px;
+}
+
+.detail-youtube-link {
+    margin-top: 0;
+    margin-bottom: 80px;
 }
 
 .youtube-wrapper iframe {
@@ -975,10 +1001,9 @@ button:focus-visible {
 }
 
 .scenes-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
-    margin-bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .scene-item {
@@ -1132,8 +1157,11 @@ button:focus-visible {
     margin-bottom: 72px;
 }
 
+/* 解説の画像は、下のキャプションまで1画面に収まる高さに抑える */
 .ui-image-figure img {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
+    max-height: calc(100svh - var(--header-h) - 240px);
     height: auto;
     background-color: var(--bg-sub);
     border: 1px solid var(--line);
@@ -1149,7 +1177,9 @@ button:focus-visible {
 }
 
 .ui-image-split-left img {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
+    max-height: calc(100svh - var(--header-h) - 96px);
     height: auto;
     background-color: var(--bg-sub);
     border: 1px solid var(--line);
@@ -1350,9 +1380,16 @@ button:focus-visible {
         padding-top: calc(var(--header-h) + 40px);
     }
 
-    /* 2列だと1枚が小さすぎるので、縦1列にする */
-    .scenes-grid {
+    /* スマホでは映像を全幅にし、シーン画像はその下に2列で並べる */
+    .video-stage.has-scenes {
         grid-template-columns: 1fr;
+        max-width: none;
+    }
+
+    .scenes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
 
     .ui-image-split {

@@ -59,15 +59,6 @@ function buildCardMedia(work) {
 }
 
 /**
- * 埋め込み用のURL（youtube.com/embed/動画ID?si=…）を、YouTube で直接見るURLに直す。
- * 形が違うときは空文字を返し、サムネイルは押せない表示になる。
- */
-function youtubeWatchUrl(embedUrl) {
-    const matched = /youtube\.com\/embed\/([\w-]+)/.exec(embedUrl || '');
-    return matched ? `https://www.youtube.com/watch?v=${matched[1]}` : '';
-}
-
-/**
  * 大きく見せる作品の、サムネイルの下に並べる静止画。
  * 映像作品はシーン画像（scenes）から、サムネイルと同じ画像を除いて最大2枚。
  * 平面作品は静止画を足さず、サムネイルを切り抜かずに元の縦横比で見せる（buildCardThumb 側）。

@@ -61,15 +61,28 @@
         <!-- 映像レイアウト (type: "video") -->
         <!-- ============================================== -->
         <div id="layout-video" hidden>
-            <div class="youtube-wrapper dummy-bg">
-                <iframe id="detail-youtube" src="" title="作品動画" loading="lazy" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen></iframe>
+            <!-- 映像を左、シーン画像を右に縦に並べ、全体が1画面に収まるようにしている -->
+            <div class="video-stage" id="video-stage">
+                <div class="youtube-wrapper dummy-bg">
+                    <iframe id="detail-youtube" src="" title="作品動画" loading="lazy" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+                </div>
+
+                <div class="scenes-grid" id="scenes-grid">
+                    <!-- シーン画像が自動で入ります -->
+                </div>
             </div>
 
-            <div class="scenes-grid" id="scenes-grid">
-                <!-- シーン画像が自動で入ります -->
-            </div>
+            <a href="" target="_blank" rel="noopener noreferrer" class="detail-site-link detail-youtube-link"
+                id="detail-youtube-link" hidden>
+                <span>YouTube で見る</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M7 17 17 7"></path>
+                    <path d="M8 7h9v9"></path>
+                </svg>
+            </a>
         </div>
 
         <!-- ============================================== -->

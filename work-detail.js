@@ -63,6 +63,14 @@ function renderVideoLayout(work) {
     if (work.youtubeUrl) {
         document.getElementById('detail-youtube').src = work.youtubeUrl;
         wrapper.classList.remove('dummy-bg');
+
+        // 大きな画面で見たい人向けに、YouTube へのリンクも添える
+        const watchUrl = youtubeWatchUrl(work.youtubeUrl);
+        if (watchUrl) {
+            const link = document.getElementById('detail-youtube-link');
+            link.href = watchUrl;
+            link.hidden = false;
+        }
     } else {
         wrapper.classList.add('dummy-scene');
         wrapper.innerHTML = '<span class="dummy-text">メイン動画（URL未設定）</span>';
@@ -71,6 +79,17 @@ function renderVideoLayout(work) {
     // シーン画像を並べる
     const scenesGrid = document.getElementById('scenes-grid');
     scenesGrid.innerHTML = '';
+
+    // 映像とシーン画像の幅の比率を、シーン画像の枚数に合わせる。
+    // 4枚なら「映像 4 : シーン列 1」にすると、縦に4枚積んだ高さが映像の高さとほぼ揃う。
+    // さらに全体の幅を、映像の高さが画面に収まるところまでに抑える（style.css の --stage-fit）。
+    const count = (work.scenes || []).length;
+    const stage = document.getElementById('video-stage');
+    if (count) {
+        stage.classList.add('has-scenes');
+        stage.style.setProperty('--scene-count', count);
+        stage.style.setProperty('--stage-cols', `minmax(0, ${count}fr) minmax(0, 1fr)`);
+    }
 
     (work.scenes || []).forEach((sceneSrc, i) => {
         const item = document.createElement('div');
