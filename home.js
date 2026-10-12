@@ -1,5 +1,5 @@
 // ===================================================================
-// m!ntmoch! Portfolio - トップページ専用スクリプト
+// Yusei Tomobe Portfolio - トップページ専用スクリプト
 // ===================================================================
 //
 // works-data.js の works 配列から、Works セクションのカードを組み立てます。
@@ -61,7 +61,7 @@ function buildCardMedia(work) {
 /**
  * 大きく見せる作品の、サムネイルの下に並べる静止画。
  * 映像作品はシーン画像（scenes）から、サムネイルと同じ画像を除いて最大2枚。
- * 平面作品は静止画を足さず、サムネイルを切り抜かずに元の縦横比で見せる（buildCardThumb 側）。
+ * 平面作品は静止画を足さない（サムネイルはどの平面作品も、切り抜かずに元の縦横比で見せる）。
  */
 function buildCardStills(work) {
     const poster = (work.thumb || {}).poster;
@@ -105,8 +105,8 @@ function buildCardThumb(work) {
     } else if (thumb.image) {
         const img = document.createElement('img');
         img.className = 'work-image';
-        // 大きく見せる平面作品は、切り抜かずに元の縦横比で見せる
-        if (work.size === 'large') {
+        // 平面作品は、ポスターなど縦長のものも多いので、切り抜かずに元の縦横比で見せる
+        if (work.type === 'graphic') {
             media.classList.add('is-natural');
             // 読み込み後に高さが決まるので、そのときに並びを組み直す
             img.addEventListener('load', () => layoutWorks());
