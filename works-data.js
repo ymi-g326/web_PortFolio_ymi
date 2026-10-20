@@ -52,7 +52,7 @@ const works = [
         title: "Reel 2026",
         role: "個人制作 / 構成・編集（音楽：TANUKINO）",
         // 流すと Reel の中の別作品に見えてしまうので、カードでは動画を流さず静止画1枚にする
-        thumb: { video: "reel26_C.mp4", poster: "reel26_s1.webp", play: false },
+        thumb: { video: "reel26_C.mp4", poster: "reel26_th.webp", play: false },
         youtubeUrl: "",
         scenes: [
             "reel26_s1.webp",
@@ -135,7 +135,7 @@ const works = [
         code: "2603EG1",
         type: "video",
         title: "FUNNY:)",
-        role: "外部からの依頼 / 映像制作",
+        role: "クライアントワーク / 映像制作",
         thumb: { video: "funny_C.mp4", poster: "funny_s1.webp" },
         youtubeUrl: "",
         scenes: [
@@ -145,7 +145,7 @@ const works = [
             "funny_s4.webp"
         ],
         summary: "楽曲「FUNNY:)」に合わせ、歌詞のタイポグラフィとPC画面風のグラフィックで構成した映像。",
-        description: "外部からの依頼で制作した、楽曲「FUNNY:)」の映像（約3分50秒）。\n古いPCのデスクトップやウィンドウ、読み込み画面をモチーフにしたグラフィックと、画面いっぱいに組んだ歌詞のタイポグラフィで構成している。\n色を青・ミント・ピンクに絞り、走査線のような横縞を全体にかけることで、長尺でも1つの世界観として見られるようにした。",
+        description: "クライアントからの依頼で制作した、楽曲「FUNNY:)」の映像（約3分50秒）。\n古いPCのデスクトップやウィンドウ、読み込み画面をモチーフにしたグラフィックと、画面いっぱいに組んだ歌詞のタイポグラフィで構成している。\n色を青・ミント・ピンクに絞り、走査線のような横縞を全体にかけることで、長尺でも1つの世界観として見られるようにした。",
         tools: "",
         duration: ""
     },
@@ -157,7 +157,7 @@ const works = [
         code: "2511GZ2",
         type: "graphic",
         title: "Applied Typography 34",
-        role: "大学課題 / 個人制作 / タイポグラフィ・グラフィックデザイン",
+        role: "個人制作 / タイポグラフィ・グラフィックデザイン",
         thumb: { image: "typo.webp" },
         mainImage: "typo.webp",
         summary: "グリッドシステムで組んだ文字の上に、リキッドグラスのレンズを重ねたタイポグラフィのポスター。",
@@ -193,7 +193,7 @@ const works = [
         code: "2511EZ2",
         type: "video",
         title: "mitsudo",
-        role: "個人制作 / 企画・構成・アニメーション・音楽",
+        role: "個人制作 / 企画・構成・モーショングラフィックス・音楽",
         thumb: { video: "mitsudo_C.mp4", poster: "mitsudo_s1.webp" },
         youtubeUrl: "https://www.youtube.com/embed/i7VN9uKSWgc?si=iqvr-u1mwKyn9AUC",
         scenes: [
@@ -222,20 +222,20 @@ const works = [
             "sh_s1.webp",
             "sh_s2.webp"
         ],
-        summary: "アイドルグループ「Sugar Holic」から依頼を受けて制作したロゴモーション。",
+        summary: "「可愛さ」を表現したロゴモーション。",
         description: "アイドルグループ「Sugar Holic」のロゴモーション。\nロゴのドットのハートに世界観を揃えるため、周りのエフェクトもあえて解像度を落とし、粒の大きさを合わせている。\nまた、それらはメンバーそれぞれのカラーで構成することで、グループとしてのチーム性を強調した。\n柔らかい球がハートになるまでに弾力のある動きをつけて、アイドルの可愛らしさを演出している。",
         tools: "After Effects",
         duration: "2日"
     },
 
     // -----------------------------------------------------
-    // 9. 「27の先の星」幕間映像 ── イベント提供作品
+    // 9. 「27の先の星」幕間映像 ── クライアントワーク
     // -----------------------------------------------------
     {
         code: "2601EG1",
         type: "video",
         title: "「27の先の星」幕間映像",
-        role: "イベント提供作品 / 映像制作（キャラクターデザイン：dzu）",
+        role: "クライアントワーク / 映像制作（キャラクターデザイン：dzu）",
         thumb: { video: "27atar_C.mp4", poster: "27star_s1.webp" },
         youtubeUrl: "https://www.youtube.com/embed/i7yF8syupAM?si=0phM6bY1UNHpkF9U",
         scenes: [
@@ -249,17 +249,17 @@ const works = [
     },
 
     // -----------------------------------------------------
-    // 10. 第29回 明治学院大学 戸塚まつり ── 外部からの依頼のグラフィック（文言は下書き：Claude 2026-10-20）
+    // 10. 第29回 明治学院大学 戸塚まつり ── クライアントワークのグラフィック（文言は下書き：Claude 2026-10-20）
     // -----------------------------------------------------
     {
         code: "2601GG1",
         type: "graphic",
         title: "第29回 明治学院大学 戸塚まつり",
-        role: "外部からの依頼 / グラフィックデザイン",
+        role: "クライアントワーク / グラフィックデザイン",
         thumb: { image: "totsuka_front.webp" },
         mainImage: "totsuka_front.webp",
         summary: "第29回 明治学院大学 戸塚まつりのテーマ「祭縁」に合わせて制作したグラフィック。",
-        description: "外部からの依頼で制作した、第29回 明治学院大学 戸塚まつりのグラフィック。テーマは「祭縁」。\nテーマの文字を細い線で組んだ書き文字と、円や波の重なりで表面を構成し、緑と黄色の淡い配色でまとめた。\n裏面には協賛企業のロゴを配置し、表面と同じ線のモチーフでつないでいる。",
+        description: "クライアントからの依頼で制作した、第29回 明治学院大学 戸塚まつりのグラフィック。テーマは「祭縁」。\nテーマの文字を細い線で組んだ書き文字と、円や波の重なりで表面を構成し、緑と黄色の淡い配色でまとめた。\n裏面には協賛企業のロゴを配置し、表面と同じ線のモチーフでつないでいる。",
         tools: "Illustrator",
         duration: "",
 
