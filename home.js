@@ -174,12 +174,18 @@ function setupWorksCount() {
 
 
 // ===================================================================
-// 1-2. カードを同じ幅の列に積んでいく（石垣のような並べ方）
-//    列の数は style.css「00. 文字の調整パネル」の --works-columns（PCでの列数）。
-//    画面が狭いときは自動で減らす（下の columnsForWidth）。
-//    カードは表示順に、その時点で一番短い列へ入れていく。
-//    幅はどのカードも同じなので、Video / Graphic で絞り込んでも大きさは変わらない。
-//    大きく見せたい作品は、静止画を組み合わせて縦に長くしている（buildCardStills）。
+// 1-2. 作品一覧の並べ方（表示ごとに組み方を変える）
+//
+//    All     … 石垣型。同じ幅の列に、表示順に「一番短い列」へ積んでいく。
+//               縦長のポスターは列の幅いっぱいに縦に大きく出て、わざとずれた段差ができる。
+//               ただし偶然 数px だけずれた並びはミスに見えるので、近いものは揃える（snapNearRows）。
+//    Video   … 格子型。全部 16:9 なので、同じ大きさのカードを行と列にきっちり並べる。
+//    Graphic … 行揃え型。行ごとに画像の高さを揃え、行の右端が画面の端ぴったりで終わるよう拡大縮小する。
+//               縦長・横長が混ざっても、上下左右がそろう。平面作品だけなので行を高めにとり、ポスターを大きく見せる。
+//
+//    列の数は style.css「00. 文字の調整パネル」の --works-columns（PCでの列数）。画面が狭いと自動で減らし、
+//    1列になる幅（スマホ）では、どの表示も縦に1列で並べる。Graphic は2列の幅では石垣型にする。
+//    Graphic の行の高さの目安は、同じパネルの --works-row-height。
 // ===================================================================
 function columnsForWidth(max) {
     const w = window.innerWidth;
@@ -189,24 +195,59 @@ function columnsForWidth(max) {
     return max;
 }
 
+// いま選ばれている絞り込み（all / video / graphic）
+function currentFilter() {
+    const active = document.querySelector('.filter-btn.active');
+    return active ? active.dataset.filter : 'all';
+}
+
 function layoutWorks() {
     const grid = document.getElementById('works-grid');
     if (!grid) return;
 
-    // 一度列に分けると、ページ上の順番が「列ごと」になってしまうので、元の順番に並べ直してから配る
+    // 列や行に分けると、ページ上の順番が崩れるので、元の順番に並べ直してから配る
     const items = [...grid.querySelectorAll('.work-item')]
         .sort((a, b) => a.dataset.order - b.dataset.order);
-    const max = parseInt(getComputedStyle(grid).getPropertyValue('--works-columns'), 10) || 4;
+    const visible = items.filter(item => !item.classList.contains('is-hidden'));
+    const styles = getComputedStyle(grid);
+    const max = parseInt(styles.getPropertyValue('--works-columns'), 10) || 4;
     const count = columnsForWidth(max);
 
-    // 列の箱を作り直す（カード自体は作り直さず、移し替えるだけ）
+    // 前回の組み方の箱と、文字の高さ・ずらしの調整をいったん全部外す
+    const holder = document.createDocumentFragment();
+    items.forEach(item => {
+        item.style.width = '';
+        item.style.marginTop = '';
+        const info = item.querySelector('.work-info');
+        if (info) info.style.minHeight = '';
+        holder.appendChild(item);
+    });
+    grid.querySelectorAll('.works-col, .works-row').forEach(box => box.remove());
+    grid.classList.remove('is-masonry', 'is-grid', 'is-rows');
+
+    // 1列（スマホ）はどの表示も縦に並べるだけ。
+    // Graphic の行揃えは、横に3枚以上入る幅でだけ使う（2枚しか入らない幅では、横長の作品と並んだ
+    // ポスターが細くなってしまうので、All と同じ石垣型にする）。
+    let mode = count === 1 ? 'all' : currentFilter();
+    if (mode === 'graphic' && count < 3) mode = 'all';
+    if (mode === 'video') {
+        layoutAsGrid(grid, items, count);
+    } else if (mode === 'graphic') {
+        layoutAsRows(grid, items, visible, styles);
+    } else {
+        layoutAsMasonry(grid, items, visible, count);
+    }
+}
+
+// --- All：石垣型 ---
+function layoutAsMasonry(grid, items, visible, count) {
+    grid.classList.add('is-masonry');
     const columns = Array.from({ length: count }, () => {
         const col = document.createElement('div');
         col.className = 'works-col';
+        grid.appendChild(col);
         return col;
     });
-    grid.querySelectorAll('.works-col').forEach(col => col.remove());
-    columns.forEach(col => grid.appendChild(col));
 
     const distribute = () => {
         // 前に配ったカードが列に残っていると高さの計算が狂うので、いったん全部外してから配る
@@ -223,22 +264,106 @@ function layoutWorks() {
         });
     };
 
-    // ① いったん配ってから、カード下の文字の部分（作品名・担当）の高さを一番高いものに揃える。
-    //    作品名が1行か2行かで列の高さが少しずつずれると、横の並びが「惜しいズレ」に見えてしまうため。
-    //    揃えておけば 16:9 の映像カードはどれも同じ高さになり、行がきれいに揃う。
-    //    （ずれて見えるのは縦長のポスターなど、わざと大きさが違うカードだけになる）
-    // ② 高さが変わったので、もう一度配り直す。
-    const infos = items.map(item => item.querySelector('.work-info')).filter(Boolean);
-    infos.forEach(info => { info.style.minHeight = ''; });
     distribute();
     if (count > 1) {
-        const tallest = Math.max(0, ...infos
-            .filter(info => !info.closest('.is-hidden'))
-            .map(info => info.offsetHeight));
-        infos.forEach(info => { info.style.minHeight = `${tallest}px`; });
+        // 作品名が1行か2行かで列の高さが少しずつずれないよう、文字の部分の高さを一番高いものに揃えてから配り直す
+        equalizeInfo(visible);
         distribute();
         snapNearRows(items);
     }
+}
+
+// --- Video：格子型 ---
+function layoutAsGrid(grid, items, count) {
+    grid.classList.add('is-grid');
+    grid.style.setProperty('--grid-columns', count);
+    items.forEach(item => grid.appendChild(item));
+    // 同じ行のカードは、文字の部分の高さも揃える（下の段の上端がそろう）
+    rowsByTop(items.filter(item => !item.classList.contains('is-hidden'))).forEach(equalizeInfo);
+}
+
+// --- Graphic：行揃え型 ---
+function layoutAsRows(grid, items, visible, styles) {
+    grid.classList.add('is-rows');
+    const gap = parseFloat(styles.getPropertyValue('--works-gap-x')) || 32;
+    const target = Math.min(
+        parseFloat(styles.getPropertyValue('--works-row-height')) || 520,
+        window.innerHeight * 0.75
+    );
+    const width = grid.clientWidth;
+
+    // 画像の縦横比（幅 ÷ 高さ）。読み込み前の画像は縦長（3:4）として仮に組み、読み込み後に組み直す
+    const ratioOf = item => {
+        const img = item.querySelector('.work-image');
+        if (img && img.naturalWidth) return img.naturalWidth / img.naturalHeight;
+        if (img && img.tagName === 'VIDEO') return 16 / 9;
+        return 3 / 4;
+    };
+
+    // 行の右端をぴったり画面の端に合わせたときの、行の高さ
+    const fitHeight = (count, sum) => (width - gap * (count - 1)) / sum;
+
+    // 行の区切り方を全通り比べて、どの行の高さも目安から離れすぎない区切り方を選ぶ。
+    // （1行ずつ順に決めると、最後に1枚だけ余ったポスターが小さくなることがあるため）
+    // 行の「ずれの大きさ」＝（行の高さ − 目安）の2乗。最後の行は、目安より高くなるなら拡大せず目安のまま置くので 0。
+    const ratios = visible.map(ratioOf);
+    const n = visible.length;
+    const best = [{ cost: 0, from: -1 }];
+    for (let i = 1; i <= n; i++) {
+        best[i] = { cost: Infinity, from: 0 };
+        let sum = 0;
+        for (let j = i - 1; j >= 0; j--) {
+            sum += ratios[j];
+            const height = fitHeight(i - j, sum);
+            const isLast = i === n;
+            const cost = isLast && height >= target ? 0 : (height - target) ** 2;
+            if (best[j].cost + cost < best[i].cost) best[i] = { cost: best[j].cost + cost, from: j };
+        }
+    }
+    const rows = [];
+    for (let i = n; i > 0; i = best[i].from) {
+        const j = best[i].from;
+        const rowItems = visible.slice(j, i);
+        const sum = ratios.slice(j, i).reduce((s, r) => s + r, 0);
+        rows.unshift({ items: rowItems, sum, full: !(i === n && fitHeight(i - j, sum) >= target) });
+    }
+
+    rows.forEach(r => {
+        const box = document.createElement('div');
+        box.className = 'works-row';
+        grid.appendChild(box);
+        // 行の右端がちょうど画面の端になる高さ。最後の行（足りない行）は拡大せず目安の高さのまま左寄せ
+        // （ぴったりにすると目安の1.3倍を超えて大きくなりすぎる行は、そこで止めて左寄せ）
+        const height = r.full ? Math.min(fitHeight(r.items.length, r.sum), target * 1.3) : target;
+        r.items.forEach(item => {
+            item.style.width = `${Math.floor(ratioOf(item) * height)}px`;
+            box.appendChild(item);
+        });
+        equalizeInfo(r.items);
+    });
+
+    // 非表示のカードは最後にまとめて置いておく
+    items.filter(item => item.classList.contains('is-hidden')).forEach(item => grid.appendChild(item));
+}
+
+// --- 共通の道具 ---
+
+// 渡したカードの、文字の部分（作品名・担当）の高さを一番高いものに揃える
+function equalizeInfo(cards) {
+    const infos = cards.map(card => card.querySelector('.work-info')).filter(Boolean);
+    const tallest = Math.max(0, ...infos.map(info => info.offsetHeight));
+    infos.forEach(info => { info.style.minHeight = `${tallest}px`; });
+}
+
+// 上端の位置が同じカードを、1行ずつのまとまりに分ける
+function rowsByTop(cards) {
+    const rows = new Map();
+    cards.forEach(card => {
+        const top = Math.round(card.getBoundingClientRect().top);
+        if (!rows.has(top)) rows.set(top, []);
+        rows.get(top).push(card);
+    });
+    return [...rows.values()];
 }
 
 /**

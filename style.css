@@ -72,6 +72,8 @@
     --works-gap-x: 32px;
     /* 上下のカードの間 */
     --works-gap-y: 64px;
+    /* Graphic で絞り込んだときの、1行の高さの目安（画面の高さの75%を超えないように抑える） */
+    --works-row-height: 520px;
 
     /* --- Contact のメールアドレス --- */
     --contact-email-size: clamp(2.35rem, 2.2vw, 1.6rem);
@@ -590,6 +592,29 @@ button:focus-visible {
     display: flex;
     align-items: flex-start;
     gap: var(--works-gap-x);
+}
+
+/* Video：同じ大きさのカードの格子（列の数は home.js が --grid-columns に入れる） */
+.works-grid.is-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--grid-columns, 4), minmax(0, 1fr));
+    gap: var(--works-gap-y) var(--works-gap-x);
+}
+
+/* Graphic：行ごとに高さを揃える（各カードの幅は home.js が縦横比から計算して入れる） */
+.works-grid.is-rows {
+    flex-direction: column;
+    gap: var(--works-gap-y);
+}
+
+.works-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--works-gap-x);
+}
+
+.works-row .work-item {
+    flex: none;
 }
 
 .works-col {
