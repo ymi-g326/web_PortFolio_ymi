@@ -1021,6 +1021,142 @@ button:focus-visible {
     object-fit: cover;
 }
 
+/* 押すと拡大表示できるシーン画像（work-detail.js「2-2. シーン画像の拡大表示」） */
+button.scene-item {
+    display: block;
+    padding: 0;
+    cursor: zoom-in;
+}
+
+button.scene-item img {
+    transition: transform 0.6s var(--ease-out);
+}
+
+button.scene-item:hover img {
+    transform: scale(1.04);
+}
+
+/* --- シーン画像の拡大表示 --- */
+/* 白ベースのサイトなので、暗幕ではなく白い紗で画面を覆う */
+.scene-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 64px 96px;
+    background-color: rgba(255, 255, 255, 0.96);
+    opacity: 0;
+    transition: opacity 0.25s var(--ease-out);
+}
+
+.scene-viewer.is-open {
+    opacity: 1;
+}
+
+.is-viewer-open {
+    overflow: hidden;
+}
+
+.scene-viewer-figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    max-width: 100%;
+    max-height: 100%;
+    transform: scale(0.98);
+    transition: transform 0.4s var(--ease-out);
+}
+
+.scene-viewer.is-open .scene-viewer-figure {
+    transform: scale(1);
+}
+
+.scene-viewer-img {
+    max-width: 100%;
+    max-height: calc(100svh - 160px);
+    width: auto;
+    height: auto;
+    border: 1px solid var(--line);
+}
+
+.scene-viewer-count {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--ink-mid);
+}
+
+.scene-viewer-btn {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--ink);
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.scene-viewer-btn:hover {
+    opacity: 0.45;
+}
+
+.scene-viewer-btn svg {
+    width: 28px;
+    height: 28px;
+}
+
+.scene-viewer-prev {
+    left: 24px;
+    top: 50%;
+    translate: 0 -50%;
+}
+
+.scene-viewer-next {
+    right: 24px;
+    top: 50%;
+    translate: 0 -50%;
+}
+
+.scene-viewer-close {
+    top: 16px;
+    right: 16px;
+}
+
+/* シーンが1枚だけのときは前後のボタンを出さない */
+.scene-viewer.is-single .scene-viewer-prev,
+.scene-viewer.is-single .scene-viewer-next {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .scene-viewer {
+        padding: 64px 16px;
+    }
+
+    .scene-viewer-prev,
+    .scene-viewer-next {
+        top: auto;
+        bottom: 16px;
+        translate: none;
+    }
+
+    .scene-viewer-prev {
+        left: 16px;
+    }
+
+    .scene-viewer-next {
+        right: 16px;
+    }
+}
+
 /* --- 平面レイアウト --- */
 /* 作品そのものを見せる場所なので、切り抜かず全体を表示する */
 .graphic-wrapper {

@@ -8,7 +8,13 @@
 // ===================================================================
 
 document.addEventListener('DOMContentLoaded', () => {
-    const workId = new URLSearchParams(window.location.search).get('id');
+    let workId = new URLSearchParams(window.location.search).get('id');
+
+    // 載せるのをやめた作品の古いURLなら、代わりの作品のページへ移す（works-data.js の retiredCodes）
+    if (workId && typeof retiredCodes !== 'undefined' && retiredCodes[workId]) {
+        window.location.replace(`work-detail.html?id=${encodeURIComponent(retiredCodes[workId])}`);
+        return;
+    }
 
     // 該当する作品がなければ一覧に戻す
     if (!workId || !worksByCode[workId]) {
@@ -91,17 +97,26 @@ function renderVideoLayout(work) {
         stage.style.setProperty('--stage-cols', `minmax(0, ${count}fr) minmax(0, 1fr)`);
     }
 
+    // 押すと大きく見られるシーン画像の一覧（下の「2-2. シーン画像の拡大表示」で使う）
+    const viewable = (work.scenes || [])
+        .map((src, i) => ({ src: src ? ASSET_IMG + src : '', alt: `${work.title} シーン${i + 1}` }))
+        .filter(scene => scene.src);
+
     (work.scenes || []).forEach((sceneSrc, i) => {
-        const item = document.createElement('div');
+        const item = document.createElement(sceneSrc ? 'button' : 'div');
         item.className = 'scene-item';
 
         if (sceneSrc) {
+            item.type = 'button';
+            item.setAttribute('aria-label', `シーン${i + 1}を大きく表示`);
             const img = document.createElement('img');
             img.src = ASSET_IMG + sceneSrc;
             img.alt = `${work.title} シーン${i + 1}`;
             img.loading = 'lazy';
             img.decoding = 'async';
             item.appendChild(img);
+            const index = viewable.findIndex(scene => scene.src === ASSET_IMG + sceneSrc);
+            item.addEventListener('click', () => openSceneViewer(viewable, index, item));
         } else {
             item.classList.add('dummy-scene');
             item.innerHTML = '<span class="dummy-text">各シーン画</span>';
@@ -109,6 +124,115 @@ function renderVideoLayout(work) {
 
         scenesGrid.appendChild(item);
     });
+}
+
+// ===================================================================
+// 2-2. シーン画像の拡大表示
+//    シーン画像を押すと画面いっぱいに表示し、前後のシーンへ送れる。
+//    操作：← → キー／左右のボタン／スマホは左右にスワイプ。Esc・×・背景を押すと閉じる。
+// ===================================================================
+let sceneViewer = null;
+
+function buildSceneViewer() {
+    const el = document.createElement('div');
+    el.className = 'scene-viewer';
+    el.hidden = true;
+    el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    el.setAttribute('aria-label', 'シーン画像');
+    el.innerHTML = `
+        <figure class="scene-viewer-figure">
+            <img class="scene-viewer-img" alt="">
+            <figcaption class="scene-viewer-count"></figcaption>
+        </figure>
+        <button type="button" class="scene-viewer-btn scene-viewer-prev" aria-label="前のシーン">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button type="button" class="scene-viewer-btn scene-viewer-next" aria-label="次のシーン">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+        <button type="button" class="scene-viewer-btn scene-viewer-close" aria-label="閉じる">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+        </button>
+    `;
+    document.body.appendChild(el);
+
+    const viewer = {
+        el,
+        img: el.querySelector('.scene-viewer-img'),
+        count: el.querySelector('.scene-viewer-count'),
+        scenes: [],
+        index: 0,
+        opener: null,
+    };
+
+    el.querySelector('.scene-viewer-prev').addEventListener('click', () => showScene(viewer.index - 1));
+    el.querySelector('.scene-viewer-next').addEventListener('click', () => showScene(viewer.index + 1));
+    el.querySelector('.scene-viewer-close').addEventListener('click', closeSceneViewer);
+    // 画像やボタン以外（背景）を押したら閉じる
+    el.addEventListener('click', e => {
+        if (e.target === el || e.target.classList.contains('scene-viewer-figure')) closeSceneViewer();
+    });
+
+    document.addEventListener('keydown', e => {
+        if (el.hidden) return;
+        if (e.key === 'Escape') closeSceneViewer();
+        else if (e.key === 'ArrowLeft') showScene(viewer.index - 1);
+        else if (e.key === 'ArrowRight') showScene(viewer.index + 1);
+        else if (e.key === 'Tab') keepFocusInside(e);
+    });
+
+    // スマホ：左右のスワイプで前後へ
+    let startX = null;
+    el.addEventListener('pointerdown', e => { startX = e.clientX; });
+    el.addEventListener('pointerup', e => {
+        if (startX === null) return;
+        const dx = e.clientX - startX;
+        startX = null;
+        if (Math.abs(dx) > 50) showScene(viewer.index + (dx < 0 ? 1 : -1));
+    });
+
+    // 開いている間は、キーボードのフォーカスをこの中だけで回す
+    function keepFocusInside(e) {
+        const buttons = [...el.querySelectorAll('button')];
+        const i = buttons.indexOf(document.activeElement);
+        const next = e.shiftKey ? (i <= 0 ? buttons.length - 1 : i - 1) : (i + 1) % buttons.length;
+        buttons[next].focus();
+        e.preventDefault();
+    }
+
+    return viewer;
+}
+
+function showScene(index) {
+    const v = sceneViewer;
+    const total = v.scenes.length;
+    v.index = (index + total) % total;   // 端まで行ったら反対側に戻る
+    const scene = v.scenes[v.index];
+    v.img.src = scene.src;
+    v.img.alt = scene.alt;
+    v.count.textContent = `${v.index + 1} / ${total}`;
+    v.el.classList.toggle('is-single', total < 2);
+}
+
+function openSceneViewer(scenes, index, opener) {
+    if (!sceneViewer) sceneViewer = buildSceneViewer();
+    sceneViewer.scenes = scenes;
+    sceneViewer.opener = opener;
+    showScene(index);
+    sceneViewer.el.hidden = false;
+    document.documentElement.classList.add('is-viewer-open');
+    // 表示してから次の描画でクラスを付けると、ふわっと出る
+    requestAnimationFrame(() => sceneViewer.el.classList.add('is-open'));
+    sceneViewer.el.querySelector('.scene-viewer-close').focus();
+}
+
+function closeSceneViewer() {
+    const v = sceneViewer;
+    v.el.classList.remove('is-open');
+    document.documentElement.classList.remove('is-viewer-open');
+    setTimeout(() => { v.el.hidden = true; }, prefersReducedMotion ? 0 : 250);
+    if (v.opener) v.opener.focus();
 }
 
 function renderGraphicLayout(work) {

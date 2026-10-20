@@ -47,6 +47,7 @@ script.js で定義した道具（`ASSET_IMG` / `setMultiline` など）を、�
 - `assets/videos/mediakiso_2.MP4`
 - `assets/documents/ホームグラフィック.pdf`
 - `assets/images/mm_logo_アルファ.svg`
+- `assets/videos/2025_reel_C.mp4`・`assets/images/2025_s1〜s4.webp`（2025 Reel。2026-10-20 に Reel 2026 へ差し替え。旧URL `?id=2512EZ2` は works-data.js の `retiredCodes` で Reel 2026 へ転送）
 
 ---
 
