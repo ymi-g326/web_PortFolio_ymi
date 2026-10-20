@@ -208,15 +208,71 @@ function layoutWorks() {
     grid.querySelectorAll('.works-col').forEach(col => col.remove());
     columns.forEach(col => grid.appendChild(col));
 
-    items.forEach(item => {
-        // 非表示のカードは高さに影響しないので、どこに入れてもよい
-        if (item.classList.contains('is-hidden')) {
-            columns[count - 1].appendChild(item);
-            return;
+    const distribute = () => {
+        // 前に配ったカードが列に残っていると高さの計算が狂うので、いったん全部外してから配る
+        const holder = document.createDocumentFragment();
+        items.forEach(item => holder.appendChild(item));
+        items.forEach(item => {
+            // 非表示のカードは高さに影響しないので、どこに入れてもよい
+            if (item.classList.contains('is-hidden')) {
+                columns[count - 1].appendChild(item);
+                return;
+            }
+            const shortest = columns.reduce((a, b) => (b.offsetHeight < a.offsetHeight ? b : a));
+            shortest.appendChild(item);
+        });
+    };
+
+    // ① いったん配ってから、カード下の文字の部分（作品名・担当）の高さを一番高いものに揃える。
+    //    作品名が1行か2行かで列の高さが少しずつずれると、横の並びが「惜しいズレ」に見えてしまうため。
+    //    揃えておけば 16:9 の映像カードはどれも同じ高さになり、行がきれいに揃う。
+    //    （ずれて見えるのは縦長のポスターなど、わざと大きさが違うカードだけになる）
+    // ② 高さが変わったので、もう一度配り直す。
+    const infos = items.map(item => item.querySelector('.work-info')).filter(Boolean);
+    infos.forEach(info => { info.style.minHeight = ''; });
+    distribute();
+    if (count > 1) {
+        const tallest = Math.max(0, ...infos
+            .filter(info => !info.closest('.is-hidden'))
+            .map(info => info.offsetHeight));
+        infos.forEach(info => { info.style.minHeight = `${tallest}px`; });
+        distribute();
+        snapNearRows(items);
+    }
+}
+
+/**
+ * ③ 隣の列のカードと、上端が「ほんの少しだけ」ずれているときは揃える。
+ *    縦長のポスターが混ざると、偶然 数px だけずれた並びができることがある。
+ *    わざとずらした配置に見えず、ミスに見えてしまうので、近いものは低い方に合わせる。
+ *    大きくずれているもの（SNAP_PX 以上）は、意図した段差としてそのまま残す。
+ *    SNAP_PX はカード同士の上下の間隔（64px）より少し小さくしてある。
+ */
+const SNAP_PX = 56;
+
+function snapNearRows(items) {
+    const visible = items.filter(item => !item.classList.contains('is-hidden'));
+    visible.forEach(item => { item.style.marginTop = ''; });
+
+    // 上にあるカードから順に見ていく（揃えると下のカードの位置も変わるので、毎回測り直す）
+    const topOf = item => item.getBoundingClientRect().top;
+    const done = new Set();
+    for (let step = 0; step < visible.length; step++) {
+        const next = visible
+            .filter(item => !done.has(item))
+            .reduce((a, b) => (topOf(b) < topOf(a) ? b : a));
+        done.add(next);
+        const top = topOf(next);
+        const column = next.parentElement;
+        // 別の列にあって、まだ見ていないカードのうち、少しだけ低いものに合わせる
+        const near = visible
+            .filter(other => !done.has(other) && other.parentElement !== column)
+            .map(other => topOf(other) - top)
+            .filter(diff => diff > 0.5 && diff < SNAP_PX);
+        if (near.length) {
+            next.style.marginTop = `${Math.max(...near)}px`;
         }
-        const shortest = columns.reduce((a, b) => (b.offsetHeight < a.offsetHeight ? b : a));
-        shortest.appendChild(item);
-    });
+    }
 }
 
 
