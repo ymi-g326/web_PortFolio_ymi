@@ -182,6 +182,7 @@ function setupWorksCount() {
 //    Video   … 格子型。全部 16:9 なので、同じ大きさのカードを行と列にきっちり並べる。
 //    Graphic … 行揃え型。行ごとに画像の高さを揃え、行の右端が画面の端ぴったりで終わるよう拡大縮小する。
 //               縦長・横長が混ざっても、上下左右がそろう。平面作品だけなので行を高めにとり、ポスターを大きく見せる。
+//               ただし、組んだ結果どれか1枚でも石垣型の 85% より細くなるなら、自動で石垣型に切り替える。
 //
 //    列の数は style.css「00. 文字の調整パネル」の --works-columns（PCでの列数）。画面が狭いと自動で減らし、
 //    1列になる幅（スマホ）では、どの表示も縦に1列で並べる。Graphic は2列の幅では石垣型にする。
@@ -232,8 +233,8 @@ function layoutWorks() {
     if (mode === 'graphic' && count < 3) mode = 'all';
     if (mode === 'video') {
         layoutAsGrid(grid, items, count);
-    } else if (mode === 'graphic') {
-        layoutAsRows(grid, items, visible, styles);
+    } else if (mode === 'graphic' && layoutAsRows(grid, items, visible, styles, count)) {
+        // 行揃えで組めた
     } else {
         layoutAsMasonry(grid, items, visible, count);
     }
@@ -283,8 +284,7 @@ function layoutAsGrid(grid, items, count) {
 }
 
 // --- Graphic：行揃え型 ---
-function layoutAsRows(grid, items, visible, styles) {
-    grid.classList.add('is-rows');
+function layoutAsRows(grid, items, visible, styles, count) {
     const gap = parseFloat(styles.getPropertyValue('--works-gap-x')) || 32;
     const target = Math.min(
         parseFloat(styles.getPropertyValue('--works-row-height')) || 520,
@@ -328,6 +328,16 @@ function layoutAsRows(grid, items, visible, styles) {
         rows.unshift({ items: rowItems, sum, full: !(i === n && fitHeight(i - j, sum) >= target) });
     }
 
+    // 保険：どれか1枚でも、石垣型（All）で並べたときの幅の 85% より細くなるなら、行揃えはやめて石垣型にする。
+    // 縦長と横長が同じ行に入ると、縦長が細くなることがあるため（横長のグラフィックが増えたときの対策）。
+    const columnWidth = (width - gap * (count - 1)) / count;
+    const tooNarrow = rows.some(r => {
+        const height = r.full ? Math.min(fitHeight(r.items.length, r.sum), target * 1.3) : target;
+        return r.items.some(item => ratioOf(item) * height < columnWidth * 0.85);
+    });
+    if (tooNarrow) return false;
+
+    grid.classList.add('is-rows');
     rows.forEach(r => {
         const box = document.createElement('div');
         box.className = 'works-row';
@@ -344,6 +354,7 @@ function layoutAsRows(grid, items, visible, styles) {
 
     // 非表示のカードは最後にまとめて置いておく
     items.filter(item => item.classList.contains('is-hidden')).forEach(item => grid.appendChild(item));
+    return true;
 }
 
 // --- 共通の道具 ---
