@@ -83,7 +83,8 @@ function buildCardStills(work) {
 
 function buildCardThumb(work) {
     const thumb = work.thumb || {};
-    const isVideoThumb = !!thumb.video;
+    // play: false の作品は、動画を流さず poster の静止画だけを出す（Reel など、流すと別の作品に見えてしまうもの）
+    const isVideoThumb = !!thumb.video && thumb.play !== false;
 
     const media = document.createElement('div');
     media.className = 'work-image-container';
@@ -102,7 +103,7 @@ function buildCardThumb(work) {
         video.playsInline = true;
         video.setAttribute('aria-hidden', 'true');
         media.appendChild(video);
-    } else if (thumb.image) {
+    } else if (thumb.image || thumb.poster) {
         const img = document.createElement('img');
         img.className = 'work-image';
         // 平面作品は、ポスターなど縦長のものも多いので、切り抜かずに元の縦横比で見せる
@@ -111,7 +112,7 @@ function buildCardThumb(work) {
             // 読み込み後に高さが決まるので、そのときに並びを組み直す
             img.addEventListener('load', () => layoutWorks());
         }
-        img.src = ASSET_IMG + thumb.image;
+        img.src = ASSET_IMG + (thumb.image || thumb.poster);
         img.alt = work.title;
         img.loading = 'lazy';
         img.decoding = 'async';

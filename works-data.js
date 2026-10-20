@@ -26,6 +26,7 @@
 //               動画なら { video: "ファイル名.mp4", poster: "静止画.webp" }
 //               静止画なら { image: "ファイル名.webp" }
 //               poster は動画が読み込まれる前に表示される静止画です（必ず指定推奨）。
+//               play: false を足すと、マウスを乗せても動画を流さず poster の静止画だけを出す。
 //   summary   : 詳細ページの冒頭に大きく出る、1行のリード文。
 //               「何の作品で、何に挑戦したか」を一息で言い切る。
 //   description : 本文。\n で改行できます。
@@ -49,9 +50,9 @@ const works = [
         code: "2610EZ1",
         type: "video",
         title: "Reel 2026",
-        size: "large",
         role: "個人制作 / 構成・編集（音楽：TANUKINO）",
-        thumb: { video: "reel26_C.mp4", poster: "reel26_s1.webp" },
+        // 流すと Reel の中の別作品に見えてしまうので、カードでは動画を流さず静止画1枚にする
+        thumb: { video: "reel26_C.mp4", poster: "reel26_s1.webp", play: false },
         youtubeUrl: "",
         scenes: [
             "reel26_s1.webp",
