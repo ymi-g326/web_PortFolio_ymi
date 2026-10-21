@@ -53,7 +53,7 @@ const works = [
         role: "個人制作 / 構成・編集（音楽：TANUKINO）",
         // 流すと Reel の中の別作品に見えてしまうので、カードでは動画を流さず静止画1枚にする
         thumb: { video: "reel26_C.mp4", poster: "reel26_th.webp", play: false },
-        youtubeUrl: "",
+        youtubeUrl: "https://www.youtube.com/embed/Vw4zY8AmupQ?si=Gmw2cSy8xzJd7tCE",
         scenes: [
             "reel26_s1.webp",
             "reel26_s2.webp",
@@ -93,7 +93,7 @@ const works = [
         title: "Archive",
         role: "個人制作（音楽：SHUNTA「Usual Spot」）",
         thumb: { video: "archive_C.mp4", poster: "archive_s1.webp" },
-        youtubeUrl: "",
+        youtubeUrl: "https://www.youtube.com/embed/wZDeC_p9LPg?si=kUEAh_iWpjdhQFp-",
         scenes: [
             "archive_s1.webp",
             "archive_s2.webp",
@@ -115,7 +115,7 @@ const works = [
         title: "てんこう2 プロジェクションマッピング展示",
         role: "NUCC 連携 / プロジェクションマッピング",
         thumb: { video: "tenkou2_C.mp4", poster: "tenkou2_s1.webp" },
-        youtubeUrl: "",
+        youtubeUrl: "https://www.youtube.com/embed/iEwrKWFbSms?si=1VpK8fRdA2n5LM4I",
         scenes: [
             "tenkou2_s1.webp",
             "tenkou2_s2.webp",
