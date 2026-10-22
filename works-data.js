@@ -137,7 +137,7 @@ const works = [
         title: "FUNNY:)",
         role: "クライアントワーク / 映像制作",
         thumb: { video: "funny_C.mp4", poster: "funny_s1.webp" },
-        youtubeUrl: "",
+        youtubeUrl: "https://www.youtube.com/embed/pRh1UFA_szQ?si=4onRJwycGOn2yw6b",
         scenes: [
             "funny_s1.webp",
             "funny_s2.webp",
