@@ -3,7 +3,7 @@
 友部優聖（m!ntmoch!）のモーショングラフィックス・ポートフォリオサイト。
 `noindex` を付けているので検索には出ず、URLを直接知っている人だけが見られる状態です。
 
-公開URL: https://mm-g326.github.io/Portfolio/
+公開URL: https://ymi-g326.github.io/web_PortFolio_ymi/
 
 ---
 
