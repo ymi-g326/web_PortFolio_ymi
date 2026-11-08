@@ -19,6 +19,9 @@ script.js         全ページ共通の処理（ナビ・スクロール・ス�
 home.js           トップページ専用（作品カードの生成・カテゴリーフィルター）
 work-detail.js    作品詳細ページ専用（?id=**** の作品を画面に流し込む）
 
+maintenance.js    メンテナンス中の切り替え（下記「メンテナンス中にする・戻す」参照）
+maintenance.html  メンテナンス中に出るページ
+
 _editor/          編集モードの道具一式（公開サイトには出ない。下記「編集モード」参照）
 
 assets/
@@ -52,6 +55,15 @@ script.js で定義した道具（`ASSET_IMG` / `setMultiline` など）を、�
 ---
 
 ## よくある作業
+
+### メンテナンス中にする・戻す
+
+`maintenance.js` の `var ON = true;` が切り替え。`true` の間は、公開サイトを開いた人全員が `maintenance.html`（準備中のページ）に案内される。
+制作が終わったら `false` にしてコミット・push すれば、ふつうのサイトに戻る。
+
+- 自分のMac（`localhost`）で確認するときは、`true` のままでもふつうのサイトが出る
+- 公開サイトの本体を自分で見たいときは、URLの最後に `?preview` を付けて1回開く（例：`https://ymi-g326.github.io/web_PortFolio_ymi/?preview`）。そのブラウザでは以後ずっと本体が見える。やめるときは `?preview=off`
+- 案内しているのは `index.html` と `work-detail.html`。昔のURL（mm-c2g.github.io）からの転送も、ここを通って準備中のページに着く
 
 ### 編集モードで文字と位置を調整する（イラレ的に）
 
